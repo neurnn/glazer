@@ -16,7 +16,6 @@ namespace Glazer.Blockchains.Models
         private static readonly IEnumerable<Seal> EMPTY_SEALS = new Seal[0];
         private static readonly CodeRef EMPTY_CODE = new CodeRef();
 
-
         /// <summary>
         /// Version of the transaction.
         /// </summary>

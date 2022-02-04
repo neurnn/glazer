@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Glazer.Core.Cryptography;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,9 +14,9 @@ namespace Glazer.Blockchains.Models.Interfaces
         Guid CodeId { get; }
 
         /// <summary>
-        /// Account to query
+        /// Key to query
         /// </summary>
-        Account Account { get; }
+        string Key { get; }
 
         /// <summary>
         /// Initialize a new record for the account.
@@ -34,10 +35,9 @@ namespace Glazer.Blockchains.Models.Interfaces
         /// <summary>
         /// Set the record with previous ETag against conflict state.
         /// </summary>
-        /// <param name="Object"></param>
-        /// <param name="Etag"></param>
+        /// <param name="Data"></param>
         /// <param name="Token"></param>
         /// <returns></returns>
-        Task<bool> SetAsync(JObject Object, Guid? Etag = null, CancellationToken Token = default);
+        Task<bool> SetAsync(Record Data, CancellationToken Token = default);
     }
 }

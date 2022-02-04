@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Glazer.Core.Cryptography;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace Glazer.Blockchains.Models
@@ -8,11 +9,16 @@ namespace Glazer.Blockchains.Models
         /// <summary>
         /// ETag of the record.
         /// </summary>
-        public Guid Etag { get; set; }
+        public Guid? Etag { get; set; }
 
         /// <summary>
         /// Value of the record.
         /// </summary>
         public JObject Value { get; set; }
+
+        /// <summary>
+        /// Transaction Reference.
+        /// </summary>
+        public TransactionRef TrxRef { get; set; }
     }
 }

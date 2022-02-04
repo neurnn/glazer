@@ -29,4 +29,5 @@ namespace Glazer.Blockchains.Models.Interfaces
         /// <returns></returns>
         Task<object> WaitAsync();
     }
+
 }

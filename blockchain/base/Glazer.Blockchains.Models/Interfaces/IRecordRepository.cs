@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Glazer.Core.Cryptography;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,34 +16,42 @@ namespace Glazer.Blockchains.Models.Interfaces
         Guid CodeId { get; }
 
         /// <summary>
-        /// Create a view that scopes the specific account.
+        /// Create a view that scopes the specific Key.
         /// </summary>
-        /// <param name="Account"></param>
+        /// <param name="Key"></param>
         /// <returns></returns>
-        IRecordView CreateView(Account Account);
+        IRecordView CreateView(string Key);
 
         /// <summary>
-        /// Initialize a record for the account.
+        /// Create a tracker that tracks the record's history.
         /// </summary>
-        /// <param name="Account"></param>
-        /// <param name="Token"></param>
+        /// <param name="Key">Null to tracking all keys</param>
+        /// <param name="Origin">Origin of the tracker</param>
         /// <returns></returns>
-        Task<Record> NewAsync(Account Account, CancellationToken Token = default);
+        IRecordTracker CreateTracker(string Key = null, TransactionRef Origin = default);
 
         /// <summary>
-        /// Get the record for the account.
+        /// Initialize a record for the Key.
         /// </summary>
-        /// <param name="Account"></param>
+        /// <param name="Key"></param>
         /// <param name="Token"></param>
         /// <returns></returns>
-        Task<Record> GetAsync(Account Account, CancellationToken Token = default);
+        Task<Record> NewAsync(string Key, CancellationToken Token = default);
+
+        /// <summary>
+        /// Get the record for the Key.
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="Token"></param>
+        /// <returns></returns>
+        Task<Record> GetAsync(string Key, CancellationToken Token = default);
 
         /// <summary>
         /// Set the record with previous ETag against conflict state.
         /// </summary>
-        /// <param name="Account"></param>
-        /// <param name="Object"></param>
+        /// <param name="Key"></param>
+        /// <param name="Data"></param>
         /// <returns></returns>
-        Task<bool> SetAsync(Account Account, JObject Object, Guid? Etag = null, CancellationToken Token = default);
+        Task<bool> SetAsync(string Key, Record Data, CancellationToken Token = default);
     }
 }
