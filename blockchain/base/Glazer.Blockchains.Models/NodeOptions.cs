@@ -13,6 +13,11 @@ namespace Glazer.Blockchains.Models
         public DateTime Epoch { get; set; } = new DateTime(2022, 2, 3, 10, 37, 0, DateTimeKind.Utc);
 
         /// <summary>
+        /// Chain Id.
+        /// </summary>
+        public Guid ChainId { get; set; } = new Guid("23c6c19d-5269-4f98-b584-b2d03e073b35");
+
+        /// <summary>
         /// Genesis Block Id.
         /// </summary>
         public Guid InitialBlockId { get; set; } = new Guid("fd4f7163-ce0b-414e-b49d-59a0e1f2c9a0");

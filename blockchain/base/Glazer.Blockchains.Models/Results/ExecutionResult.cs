@@ -1,4 +1,5 @@
 ﻿using Glazer.Blockchains.Models.Interfaces;
+using System;
 
 namespace Glazer.Blockchains.Models.Results
 {
@@ -34,5 +35,22 @@ namespace Glazer.Blockchains.Models.Results
         /// Transaction information.
         /// </summary>
         public Transaction Transaction { get; set; }
+
+        // ----------------- Determinative Properties.
+
+        /// <summary>
+        /// Indicates whether the transaction is valid or not.
+        /// </summary>
+        public bool IsValid => Math.Max(Agrees + Disagrees, 0) >= 3;
+
+        /// <summary>
+        /// Indicates whether the transaction is agreed finally.
+        /// </summary>
+        public bool IsAgreed => Agrees >= (Math.Max(Agrees + Disagrees, 1) / 3.0) * 2.0;
+
+        /// <summary>
+        /// Indicates whether the transaction is agreed finally.
+        /// </summary>
+        public bool IsDisagreed => !IsAgreed;
     }
 }

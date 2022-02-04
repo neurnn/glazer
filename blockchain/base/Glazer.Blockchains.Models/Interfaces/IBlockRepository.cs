@@ -11,6 +11,11 @@ namespace Glazer.Blockchains.Models.Interfaces
     public interface IBlockRepository
     {
         /// <summary>
+        /// Test whether the repository is read-only or not.
+        /// </summary>
+        bool IsReadOnly { get; }
+
+        /// <summary>
         /// Load a block from the repository asynchronously.
         /// </summary>
         /// <param name="Guid"></param>

@@ -20,6 +20,16 @@
         /// <summary>
         /// Forbidden by the remote peer.
         /// </summary>
-        Forbidden
+        Forbidden,
+
+        /// <summary>
+        /// Failed by the transport.
+        /// </summary>
+        Failure,
+
+        /// <summary>
+        /// Failed to invoke the packet callbacks.
+        /// </summary>
+        InvalidPacket
     }
 }

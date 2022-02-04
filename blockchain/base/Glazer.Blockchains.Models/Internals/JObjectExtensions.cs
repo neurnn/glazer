@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Glazer.Blockchains.Models.Internals
 {
-    internal static class JObjectExtensions
+    public static class JObjectExtensions
     {
         private static readonly byte[] EMPTY_BYTES = new byte[0];
 

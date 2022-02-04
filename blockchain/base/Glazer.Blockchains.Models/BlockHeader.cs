@@ -26,6 +26,11 @@ namespace Glazer.Blockchains.Models
         public Guid Guid { get; set; }
 
         /// <summary>
+        /// Chain Id of the block.
+        /// </summary>
+        public Guid ChainId { get; set; }
+
+        /// <summary>
         /// Version of the block.
         /// </summary>
         public uint Version { get; set; }
@@ -74,6 +79,7 @@ namespace Glazer.Blockchains.Models
         public void EncodeUnsealed(BinaryWriter Writer, NodeOptions Options)
         {
             Writer.Write(Guid.ToByteArray());
+            Writer.Write(ChainId.ToByteArray());
             Writer.Write(Version);
             Writer.Write(PrevGuid.ToByteArray());
             Writer.Write(PrevHash.ToString());
@@ -99,6 +105,7 @@ namespace Glazer.Blockchains.Models
         public void DecodeUnsealed(BinaryReader Reader, NodeOptions Options)
         {
             Guid = new Guid(Reader.ReadBytes(16));
+            ChainId = new Guid(Reader.ReadBytes(16));
             Version = Reader.ReadUInt32();
             PrevGuid = new Guid(Reader.ReadBytes(16));
             PrevHash = HashValue.Parse(Reader.ReadString());

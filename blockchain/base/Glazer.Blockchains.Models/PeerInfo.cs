@@ -14,17 +14,12 @@ namespace Glazer.Blockchains.Models
     public sealed class PeerInfo : IEncodable
     {
         /// <summary>
-        /// Login of the node itself.
-        /// </summary>
-        public string Login { get; set; }
-
-        /// <summary>
         /// Public Key of the node.
         /// </summary>
         public PublicKey PublicKey { get; set; }
 
         /// <summary>
-        /// Time Stamp when the peer connected.
+        /// Time Stamp when the peer authenticated.
         /// </summary>
         public DateTime TimeStamp { get; set; }
 
@@ -57,10 +52,13 @@ namespace Glazer.Blockchains.Models
         /// <returns></returns>
         public void SetStatus(PeerStatus Status)
         {
-            if (this.Status != Status)
+            lock(this)
             {
-                this.Status = Status;
-                StatusChanged?.Invoke(this, Status);
+                if (this.Status != Status)
+                {
+                    this.Status = Status;
+                    StatusChanged?.Invoke(this, Status);
+                }
             }
         }
 

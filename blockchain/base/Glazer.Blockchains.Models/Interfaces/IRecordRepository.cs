@@ -16,6 +16,11 @@ namespace Glazer.Blockchains.Models.Interfaces
         Guid CodeId { get; }
 
         /// <summary>
+        /// Test whether the record repository is read-only or not.
+        /// </summary>
+        bool IsReadOnly { get; }
+
+        /// <summary>
         /// Create a view that scopes the specific Key.
         /// </summary>
         /// <param name="Key"></param>

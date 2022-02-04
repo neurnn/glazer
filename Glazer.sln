@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.Blockchains.Models",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.Blockchains.Transports", "blockchain\base\Glazer.Blockchains.Transports\Glazer.Blockchains.Transports.csproj", "{D94921C3-8FC9-40BE-BC2C-25351D2BD798}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.Blockchains.Packets", "blockchain\base\Glazer.Blockchains.Packets\Glazer.Blockchains.Packets.csproj", "{F201CC25-FD03-4856-BA10-AEB37AA11C00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{D94921C3-8FC9-40BE-BC2C-25351D2BD798}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D94921C3-8FC9-40BE-BC2C-25351D2BD798}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D94921C3-8FC9-40BE-BC2C-25351D2BD798}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F201CC25-FD03-4856-BA10-AEB37AA11C00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F201CC25-FD03-4856-BA10-AEB37AA11C00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F201CC25-FD03-4856-BA10-AEB37AA11C00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F201CC25-FD03-4856-BA10-AEB37AA11C00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{2BEB4050-215D-49AA-8D54-37213AE56212} = {F22D2404-8EA9-42F2-AF3E-A01706AAC9E4}
 		{4EC4A79C-900A-4ABC-BC09-1A3D09D9EEC3} = {3646E570-0EAA-431F-A194-6D0804B466CE}
 		{D94921C3-8FC9-40BE-BC2C-25351D2BD798} = {3646E570-0EAA-431F-A194-6D0804B466CE}
+		{F201CC25-FD03-4856-BA10-AEB37AA11C00} = {3646E570-0EAA-431F-A194-6D0804B466CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0EEE934C-CAC9-4DFE-996F-B71C95FE7A38}

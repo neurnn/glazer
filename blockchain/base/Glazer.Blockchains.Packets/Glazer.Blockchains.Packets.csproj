@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Glazer.Blockchains.Models\Glazer.Blockchains.Models.csproj" />
-    <ProjectReference Include="..\Glazer.Blockchains.Packets\Glazer.Blockchains.Packets.csproj" />
   </ItemGroup>
 
 </Project>

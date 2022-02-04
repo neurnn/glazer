@@ -136,12 +136,15 @@ namespace Glazer.Blockchains.Models
             if (NewHash != Hash)
                 return VerificationStatus.HashError;
 
-            foreach (var Each in Seals)
+            if (Seals != null)
             {
-                if (Secp256k1.Instance.Verify(Each.Signature, Each.PublicKey, Hash))
-                    continue;
+                foreach (var Each in Seals)
+                {
+                    if (Secp256k1.Instance.Verify(Each.Signature, Each.PublicKey, Hash))
+                        continue;
 
-                return VerificationStatus.SignatureError;
+                    return VerificationStatus.SignatureError;
+                }
             }
 
             return VerificationStatus.Okay;
