@@ -12,8 +12,10 @@ namespace Glazer.Blockchains.Models
 {
     public class Transaction : IEncodable, IEncodableUnsealed, IVerifiable, IEncodeToJObject, IDecodeFromJObject
     {
-        private static readonly byte[] EMPTY_BYTES = new byte[0];
+        private static readonly List<string> EMPTY_ACTORS = new List<string>();
         private static readonly IEnumerable<Seal> EMPTY_SEALS = new Seal[0];
+        private static readonly CodeRef EMPTY_CODE = new CodeRef();
+
 
         /// <summary>
         /// Version of the transaction.
@@ -21,33 +23,26 @@ namespace Glazer.Blockchains.Models
         public uint Version { get; set; }
 
         /// <summary>
+        /// Flag values of the transaction.
+        /// </summary>
+        public uint Flags { get; set; } = 0;
+
+        /// <summary>
         /// Time Stamp.
         /// </summary>
         public DateTime TimeStamp { get; set; }
 
         /// <summary>
-        /// Blob that is target of the transaction.
+        /// Code Reference to invoke.
         /// </summary>
-        public Guid BlobId { get; set; }
+        public CodeRef Code { get; set; }
 
         /// <summary>
-        /// Latest ETag of the target blob.
+        /// Verification Code Reference to invoke.
+        /// The function must take the expected result and real result like: 
+        /// <code>function verify(real_result, expected_result [, record_repository]) { ... }</code>
         /// </summary>
-        public string ETag { get; set; }
-
-        /// <summary>
-        /// Code Target to invoke.<br />
-        /// e.g. Prebuilt feature: "pb:controller.method" and the <see cref="CodeBody"/> should be empty. <br />
-        /// e.g. Jint (ECMAScript 2019): "jint:object.function" and the <see cref="CodeBody"/> should have the script in binary, utf-8.<br />
-        /// </summary>
-        public string CodeKind { get; set; }
-
-        /// <summary>
-        /// Code Body to invoke. <br />
-        /// e.g. Prebuilt feature: "pb:controller.method" and the <see cref="CodeBody"/> should be empty. <br />
-        /// e.g. Jint (ECMAScript 2019): "jint:object.function" and the <see cref="CodeBody"/> should have the script in binary, utf-8.<br />
-        /// </summary>
-        public byte[] CodeBody { get; set; }
+        public CodeRef VerifyCode { get; set; }
 
         /// <summary>
         /// Argument object that is to be supplied to the code.
@@ -68,6 +63,11 @@ namespace Glazer.Blockchains.Models
         public HashValue Hash { get; set; }
 
         /// <summary>
+        /// Actors that refered by the transaction.
+        /// </summary>
+        public List<string> Actors { get; set; }
+
+        /// <summary>
         /// Seals that is generated from remote peers.
         /// </summary>
         public List<Seal> Seals { get; set; }
@@ -86,7 +86,7 @@ namespace Glazer.Blockchains.Models
         /// Update Hash information.
         /// </summary>
         /// <param name="Options"></param>
-        public void Update(BlockOptions Options) => Hash = MakeHashValue(this, Options, false);
+        public void Update(NodeOptions Options) => Hash = MakeHashValue(this, Options, false);
 
         /// <summary>
         /// Set the transaction status and notify its change.
@@ -106,7 +106,7 @@ namespace Glazer.Blockchains.Models
         /// </summary>
         /// <param name="Transaction"></param>
         /// <returns></returns>
-        public static HashValue MakeHashValue(Transaction Transaction, BlockOptions Options, bool Sealed = false)
+        public static HashValue MakeHashValue(Transaction Transaction, NodeOptions Options, bool Sealed = false)
         {
             using (var Stream = new MemoryStream())
             {
@@ -128,7 +128,7 @@ namespace Glazer.Blockchains.Models
         /// Verify the transaction.
         /// </summary>
         /// <returns></returns>
-        public VerificationStatus Verify(BlockOptions Options, bool Enforce = false)
+        public VerificationStatus Verify(NodeOptions Options, bool Enforce = false)
         {
             if (!Enforce && (Hash == HashValue.Empty || Seals.Count <= 1))
                 return VerificationStatus.Incompleted;
@@ -152,7 +152,7 @@ namespace Glazer.Blockchains.Models
         /// Encode the transaction to the <see cref="BinaryWriter"/>.
         /// </summary>
         /// <param name="Writer"></param>
-        public void Encode(BinaryWriter Writer, BlockOptions Options)
+        public void Encode(BinaryWriter Writer, NodeOptions Options)
         {
             EncodeUnsealed(Writer, Options);
 
@@ -167,33 +167,37 @@ namespace Glazer.Blockchains.Models
         /// Encode the transaction to the <see cref="BinaryWriter"/> without seals.
         /// </summary>
         /// <param name="Writer"></param>
-        public void EncodeUnsealed(BinaryWriter Writer, BlockOptions Options)
+        public void EncodeUnsealed(BinaryWriter Writer, NodeOptions Options)
         {
             var ParamBytes = Parameter.EncodeAsBson();
             var ResultBytes = ExpectedResult.EncodeAsBson();
-            var CodeBody = this.CodeBody ?? EMPTY_BYTES;
 
             Writer.Write(Version);
+            Writer.Write(Flags);
             Writer.Write(TimeStamp.ToSeconds(Options.Epoch));
 
-            Writer.Write(BlobId.ToByteArray());
-            Writer.Write(ETag ?? "");
-            Writer.Write(CodeKind ?? "");
+            (Code ?? EMPTY_CODE).Encode(Writer, Options);
+            (VerifyCode ?? EMPTY_CODE).Encode(Writer, Options);
 
-            Writer.Write(CodeBody.Length);
             Writer.Write(ParamBytes.Length);
             Writer.Write(ResultBytes.Length);
+            Writer.Write((Actors ?? EMPTY_ACTORS).Count);
 
-            Writer.Write(CodeBody);
             Writer.Write(ParamBytes);
             Writer.Write(ResultBytes);
+
+            if (Actors != null)
+            {
+                foreach(var Actor in Actors)
+                    Writer.Write(Actor ?? "");
+            }
         }
 
         /// <summary>
         /// Decode the transaction from the <see cref="BinaryReader"/>.
         /// </summary>
         /// <param name="Reader"></param>
-        public void Decode(BinaryReader Reader, BlockOptions Options)
+        public void Decode(BinaryReader Reader, NodeOptions Options)
         {
             DecodeUnsealed(Reader, Options);
 
@@ -209,29 +213,32 @@ namespace Glazer.Blockchains.Models
         /// Decode the transaction from the <see cref="BinaryReader"/> without seals.
         /// </summary>
         /// <param name="Writer"></param>
-        public void DecodeUnsealed(BinaryReader Reader, BlockOptions Options)
+        public void DecodeUnsealed(BinaryReader Reader, NodeOptions Options)
         {
             Version = Reader.ReadUInt32();
+            Flags = Reader.ReadUInt32();
             TimeStamp = Reader.ReadDouble().ToDateTime(Options.Epoch);
 
-            BlobId = new Guid(Reader.ReadBytes(16));
-            ETag = Reader.ReadString();
-            CodeKind = Reader.ReadString();
+            (Code = new CodeRef()).Decode(Reader, Options);
+            (VerifyCode = new CodeRef()).Decode(Reader, Options);
 
-            var CodeLength = Reader.ReadInt32();
             var ParamLength = Reader.ReadInt32();
             var ResultLength = Reader.ReadInt32();
+            var ActorLength = Reader.ReadInt32();
 
-            CodeBody = Reader.ReadBytes(CodeLength) ?? EMPTY_BYTES;
             Parameter = Reader.ReadBytes(ParamLength).DecodeAsBson();
             ExpectedResult = Reader.ReadBytes(ResultLength).DecodeAsBson();
+            Actors = new List<string>();
+
+            for (var i = 0; i < ActorLength; ++i)
+                Actors.Add(Reader.ReadString());
         }
 
         /// <summary>
         /// Encode the transaction to <see cref="JObject"/>.
         /// </summary>
         /// <returns></returns>
-        public JObject EncodeToJObject(BlockOptions Options)
+        public JObject EncodeToJObject(NodeOptions Options)
         {
             var New = new JObject();
             var Signs = new JArray();
@@ -249,12 +256,11 @@ namespace Glazer.Blockchains.Models
             New["version"] = Version;
             New["timestamp"] = TimeStamp.ToSeconds(Options.Epoch);
             New["seals"] = Signs;
-            New["blob.id"] = BlobId.ToString();
-            New["blob.etag"] = ETag ?? "";
-            New["code.kind"] = CodeKind;
-            New["code.body"] = Base58.Encode(CodeBody ?? EMPTY_BYTES);
+            New["code"] = Code.EncodeToJObject(Options);
+            New["code_verify"] = Code.EncodeToJObject(Options);
             New["parameter"] = Parameter;
             New["expects"] = ExpectedResult;
+            New["actors"] = new JArray(Actors.ToArray());
 
             return New;
         }
@@ -263,15 +269,13 @@ namespace Glazer.Blockchains.Models
         /// Decode the transaction from <see cref="JObject"/>.
         /// </summary>
         /// <param name="JObject"></param>
-        public void DecodeFromJObject(JObject JObject, BlockOptions Options)
+        public void DecodeFromJObject(JObject JObject, NodeOptions Options)
         {
             Hash = HashValue.Parse(JObject.Value<string>("hash") ?? "null");
             Version = JObject.Value<uint>("version");
             TimeStamp = JObject.Value<double>("timestamp").ToDateTime(Options.Epoch);
-            BlobId = new Guid(JObject.Value<string>("blob.id"));
-            ETag = JObject.Value<string>("blob.etag");
-            CodeKind = JObject.Value<string>("code.kind");
-            CodeBody = Base58.Decode(JObject.Value<string>("code.body"));
+            (Code = new CodeRef()).DecodeFromJObject(JObject.Value<JObject>("code"), Options);
+            (VerifyCode = new CodeRef()).DecodeFromJObject(JObject.Value<JObject>("code_verify"), Options);
             Parameter = JObject.Value<JObject>("parameter");
             ExpectedResult = JObject.Value<JObject>("expects");
 
@@ -284,6 +288,12 @@ namespace Glazer.Blockchains.Models
                 var Value = SignatureValue.Parse(Seals[i].Value<string>("value"));
                 this.Seals.Add(new Seal(Key, Value));
             }
+
+            var Actors = JObject.Value<JArray>("actors");
+            this.Actors = new List<string>();
+
+            for(var i = 0; i < Actors.Count; ++i)
+                this.Actors.Add(Actors[i].Value<string>());
         }
     }
 }

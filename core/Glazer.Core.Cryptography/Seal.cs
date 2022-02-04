@@ -5,6 +5,11 @@ namespace Glazer.Core.Cryptography
     public struct Seal : IEquatable<Seal>, IEquatable<string>
     {
         /// <summary>
+        /// Empty Seal.
+        /// </summary>
+        public static readonly Seal Empty = new Seal(PublicKey.Empty, SignatureValue.Empty);
+
+        /// <summary>
         /// Initialize a new <see cref="Seal"/>.
         /// </summary>
         /// <param name="PublicKey"></param>

@@ -8,6 +8,6 @@ namespace Glazer.Blockchains.Models.Interfaces
         /// Encode to <see cref="JObject"/>.
         /// </summary>
         /// <returns></returns>
-        JObject EncodeToJObject(BlockOptions Options);
+        JObject EncodeToJObject(NodeOptions Options);
     }
 }

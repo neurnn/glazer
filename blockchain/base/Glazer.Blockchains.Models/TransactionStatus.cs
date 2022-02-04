@@ -28,7 +28,7 @@
         Hardened,
 
         /// <summary>
-        /// Denied from the remote peers.
+        /// Denied from the remote peers. (2/3 totally)
         /// </summary>
         Denied
     }

@@ -8,6 +8,6 @@ namespace Glazer.Blockchains.Models.Interfaces
         /// Verify the instance.
         /// </summary>
         /// <returns></returns>
-        VerificationStatus Verify(BlockOptions Options, bool Enforce = false);
+        VerificationStatus Verify(NodeOptions Options, bool Enforce = false);
     }
 }

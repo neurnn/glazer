@@ -54,13 +54,13 @@ namespace Glazer.Blockchains.Models
         /// Update Hash information.
         /// </summary>
         /// <param name="Options"></param>
-        public void Update(BlockOptions Options) => Hash = MakeHashValue(this, Options, false);
+        public void Update(NodeOptions Options) => Hash = MakeHashValue(this, Options, false);
 
         /// <summary>
         /// Encode the block header to the <see cref="BinaryWriter"/>
         /// </summary>
         /// <param name="Writer"></param>
-        public void Encode(BinaryWriter Writer, BlockOptions Options)
+        public void Encode(BinaryWriter Writer, NodeOptions Options)
         {
             EncodeUnsealed(Writer, Options);
             Writer.Write(Hash.ToString());
@@ -71,7 +71,7 @@ namespace Glazer.Blockchains.Models
         /// </summary>
         /// <param name="Writer"></param>
         /// <param name="Options"></param>
-        public void EncodeUnsealed(BinaryWriter Writer, BlockOptions Options)
+        public void EncodeUnsealed(BinaryWriter Writer, NodeOptions Options)
         {
             Writer.Write(Guid.ToByteArray());
             Writer.Write(Version);
@@ -85,7 +85,7 @@ namespace Glazer.Blockchains.Models
         /// </summary>
         /// <param name="Reader"></param>
         /// <param name="Options"></param>
-        public void Decode(BinaryReader Reader, BlockOptions Options)
+        public void Decode(BinaryReader Reader, NodeOptions Options)
         {
             DecodeUnsealed(Reader, Options);
             Hash = HashValue.Parse(Reader.ReadString());
@@ -96,7 +96,7 @@ namespace Glazer.Blockchains.Models
         /// </summary>
         /// <param name="Reader"></param>
         /// <param name="Options"></param>
-        public void DecodeUnsealed(BinaryReader Reader, BlockOptions Options)
+        public void DecodeUnsealed(BinaryReader Reader, NodeOptions Options)
         {
             Guid = new Guid(Reader.ReadBytes(16));
             Version = Reader.ReadUInt32();
@@ -110,7 +110,7 @@ namespace Glazer.Blockchains.Models
         /// </summary>
         /// <param name="Header"></param>
         /// <returns></returns>
-        public static HashValue MakeHashValue(BlockHeader Header, BlockOptions Options, bool Sealed = false)
+        public static HashValue MakeHashValue(BlockHeader Header, NodeOptions Options, bool Sealed = false)
         {
             using (var Stream = new MemoryStream())
             {
@@ -140,7 +140,7 @@ namespace Glazer.Blockchains.Models
         /// <param name="Options"></param>
         /// <param name="Enforce"></param>
         /// <returns></returns>
-        public VerificationStatus Verify(BlockOptions Options, bool Enforce = false)
+        public VerificationStatus Verify(NodeOptions Options, bool Enforce = false)
         {
             if (!Enforce && Hash == HashValue.Empty)
                 return VerificationStatus.Incompleted;
@@ -157,7 +157,7 @@ namespace Glazer.Blockchains.Models
         /// </summary>
         /// <param name="Options"></param>
         /// <returns></returns>
-        public JObject EncodeToJObject(BlockOptions Options)
+        public JObject EncodeToJObject(NodeOptions Options)
         {
             var New = new JObject();
 
@@ -176,7 +176,7 @@ namespace Glazer.Blockchains.Models
         /// </summary>
         /// <param name="JObject"></param>
         /// <param name="Options"></param>
-        public void DecodeFromJObject(JObject JObject, BlockOptions Options)
+        public void DecodeFromJObject(JObject JObject, NodeOptions Options)
         {
             Guid = new Guid(JObject.Value<string>("guid"));
             Hash = HashValue.Parse(JObject.Value<string>("hash"));

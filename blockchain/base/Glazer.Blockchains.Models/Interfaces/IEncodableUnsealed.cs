@@ -13,12 +13,12 @@ namespace Glazer.Blockchains.Models.Interfaces
         /// Serialize the instance to <see cref="BinaryWriter"/>.
         /// </summary>
         /// <param name="Writer"></param>
-        void EncodeUnsealed(BinaryWriter Writer, BlockOptions Options);
+        void EncodeUnsealed(BinaryWriter Writer, NodeOptions Options);
 
         /// <summary>
         /// Unserialize the instance from <see cref="BinaryReader"/>.
         /// </summary>
         /// <param name="Reader"></param>
-        void DecodeUnsealed(BinaryReader Reader, BlockOptions Options);
+        void DecodeUnsealed(BinaryReader Reader, NodeOptions Options);
     }
 }

@@ -8,12 +8,12 @@ namespace Glazer.Blockchains.Models.Interfaces
         /// Encode the instance to <see cref="BinaryWriter"/>.
         /// </summary>
         /// <param name="Writer"></param>
-        void Encode(BinaryWriter Writer, BlockOptions Options);
+        void Encode(BinaryWriter Writer, NodeOptions Options);
 
         /// <summary>
         /// Decode the instance from <see cref="BinaryReader"/>.
         /// </summary>
         /// <param name="Reader"></param>
-        void Decode(BinaryReader Reader, BlockOptions Options);
+        void Decode(BinaryReader Reader, NodeOptions Options);
     }
 }
