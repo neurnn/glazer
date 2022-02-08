@@ -1,4 +1,4 @@
-﻿namespace Glazer.Nodes.Models.Networks
+﻿namespace Glazer.Nodes.Models.Contracts
 {
     public enum NodeStatus
     {
@@ -20,6 +20,6 @@
         /// <summary>
         /// Executing a request.
         /// </summary>
-        Executing,
+        Executing
     }
 }

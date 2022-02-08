@@ -1,22 +1,20 @@
-﻿using Glazer.Nodes.Models;
-using Glazer.Nodes.Exceptions;
+﻿using Glazer.Nodes.Exceptions;
+using Glazer.Nodes.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
-using Glazer.Nodes.Helpers;
+using System.Threading.Tasks;
 
-namespace Glazer.Nodes.Models.Networks
+namespace Glazer.Nodes.Models.Contracts
 {
     /// <summary>
-    /// Node interface.
+    /// Node Feature.
     /// </summary>
-    public abstract class Node : IAsyncDisposable
+    public abstract class NodeFeature
     {
         private NodeStatus m_Status = NodeStatus.Created;
         private List<Func<NodeStatus, Task>> m_StatusChanged = new();
+        private List<Func<NodeRequest, Task<NodeResponse>>> m_Subscribers = new();
 
         /// <summary>
         /// Test whether the node is from remote or not.
@@ -35,9 +33,9 @@ namespace Glazer.Nodes.Models.Networks
         public abstract bool IsRemoteInitiated { get; }
 
         /// <summary>
-        /// Features that supported by the node.
+        /// Type of the node.
         /// </summary>
-        public abstract NodeFeature[] Features { get; }
+        public abstract NodeFeatureType NodeType { get; }
 
         /// <summary>
         /// Status of the node.
@@ -101,7 +99,7 @@ namespace Glazer.Nodes.Models.Networks
         /// </summary>
         /// <param name="Token"></param>
         /// <returns></returns>
-        public async Task<bool> WaitAsync(NodeStatus Status, CancellationToken Token = default)
+        public virtual async Task<bool> WaitAsync(NodeStatus Status, CancellationToken Token = default)
         {
             if (this.LockedGet(ref m_Status) != Status)
             {
@@ -138,9 +136,84 @@ namespace Glazer.Nodes.Models.Networks
         public abstract Task<NodeResponse> ExecuteAsync(NodeRequest Request);
 
         /// <summary>
-        /// Disposes the internal connection instance and discard all states.
+        /// Subscribe requests from the node.
         /// </summary>
+        /// <param name="Subscriber"></param>
         /// <returns></returns>
-        public virtual ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public virtual IDisposable SubscribeRequests(Func<NodeRequest, Task<NodeResponse>> Subscriber)
+        {
+            if (Subscriber is null)
+                throw new ArgumentNullException(nameof(Subscriber));
+
+            lock (m_Subscribers)
+            {
+                m_Subscribers.Add(Subscriber);
+
+                if (m_Subscribers.Count == 1)
+                    OnBeginSubscription();
+            }
+
+            return new Unsubscribe
+            {
+                Action = () =>
+                {
+                    lock (m_Subscribers)
+                    {
+                        m_Subscribers.Remove(Subscriber);
+
+                        if (m_Subscribers.Count <= 0)
+                            OnEndSubscription();
+                    }
+                }
+            };
+        }
+
+        /// <summary>
+        /// Deliver the request to subscribers.
+        /// </summary>
+        /// <param name="Request"></param>
+        /// <returns></returns>
+        protected virtual async Task<NodeResponse> DeliverAsync(NodeRequest Request)
+        {
+            var Queue = m_Subscribers.Locked(X => new Queue<Func<NodeRequest, Task<NodeResponse>>>(X));
+
+            while (Queue.TryDequeue(out var Subscriber))
+            {
+                var Response = await Subscriber(Request);
+                if (Response != null && Response.Message != null)
+                    return Response;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Called when the first subscriber starts their subscription.
+        /// </summary>
+        protected virtual void OnBeginSubscription()
+        {
+
+        }
+
+        /// <summary>
+        /// Called when the last subscriber ends their subscription.
+        /// </summary>
+        protected virtual void OnEndSubscription()
+        {
+
+        }
+
+        /// <summary>
+        /// Unsubscribe on dispose.
+        /// </summary>
+        private struct Unsubscribe : IDisposable
+        {
+            public Action Action;
+            public void Dispose()
+            {
+                Action?.Invoke();
+                Action = null;
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Glazer.Nodes.Records
 {
-    public struct RecordColumnKey : IEquatable<RecordColumnKey>
+    public struct HistoryColumnKey : IEquatable<HistoryColumnKey>
     {
         /// <summary>
         /// Characters that allowed for the Column Name.
@@ -19,47 +19,47 @@ namespace Glazer.Nodes.Records
         /// <summary>
         /// Null Key that points nothing.
         /// </summary>
-        public static readonly RecordColumnKey Null = new RecordColumnKey();
+        public static readonly HistoryColumnKey Null = new HistoryColumnKey();
 
         /// <summary>
-        /// Initialize a new <see cref="RecordColumnKey"/> value.
+        /// Initialize a new <see cref="HistoryColumnKey"/> value.
         /// </summary>
         /// <param name="Login"></param>
         /// <param name="CodeId"></param>
         /// <param name="Column"></param>
-        public RecordColumnKey(string Login, HashValue CodeId, string Column)
+        public HistoryColumnKey(string Login, HashValue CodeId, string Column)
         {
-            RecordKey = new RecordKey(Login, CodeId);
+            RowKey = new HistoryRowKey(Login, CodeId);
             this.Column = Column;
         }
 
         /// <summary>
-        /// Initialize a new <see cref="RecordColumnKey"/> value.
+        /// Initialize a new <see cref="HistoryColumnKey"/> value.
         /// </summary>
         /// <param name="Login"></param>
         /// <param name="CodeId"></param>
         /// <param name="Column"></param>
-        public RecordColumnKey(RecordKey RecordKey, string Column)
+        public HistoryColumnKey(HistoryRowKey RowKey, string Column)
         {
-            this.RecordKey = RecordKey;
+            this.RowKey = RowKey;
             this.Column = Column;
         }
 
         /// <summary>
-        /// Initialize a new <see cref="RecordColumnKey"/> value.
+        /// Initialize a new <see cref="HistoryColumnKey"/> value.
         /// </summary>
         /// <param name="Input"></param>
-        public RecordColumnKey(string Input)
+        public HistoryColumnKey(string Input)
         {
             var Temp = Parse(Input);
 
-            RecordKey = Temp.RecordKey;
+            RowKey = Temp.RowKey;
             Column = Temp.Column;
         }
 
         /* Compares two hash values. */
-        public static bool operator ==(RecordColumnKey L, RecordColumnKey R) => L.Equals(R);
-        public static bool operator !=(RecordColumnKey L, RecordColumnKey R) => !L.Equals(R);
+        public static bool operator ==(HistoryColumnKey L, HistoryColumnKey R) => L.Equals(R);
+        public static bool operator !=(HistoryColumnKey L, HistoryColumnKey R) => !L.Equals(R);
 
         /// <summary>
         /// Test whether the column name is valid to use on the system or not.
@@ -84,7 +84,7 @@ namespace Glazer.Nodes.Records
         /// <param name="Input"></param>
         /// <param name="Output"></param>
         /// <returns></returns>
-        public static bool TryParse(string Input, out RecordColumnKey Output)
+        public static bool TryParse(string Input, out HistoryColumnKey Output)
         {
             var Sharp = Input.IndexOf('#');
             if (Sharp > 0)
@@ -92,9 +92,9 @@ namespace Glazer.Nodes.Records
                 var KeyStr = Input.Substring(0, Sharp);
                 var Column = Input.Substring(Sharp + 1);
 
-                if (RecordKey.TryParse(KeyStr, out var Key))
+                if (HistoryRowKey.TryParse(KeyStr, out var Key))
                 {
-                    Output = new RecordColumnKey(Key, Column);
+                    Output = new HistoryColumnKey(Key, Column);
                     return true;
                 }
             }
@@ -108,7 +108,7 @@ namespace Glazer.Nodes.Records
         /// </summary>
         /// <param name="Input"></param>
         /// <returns></returns>
-        public static RecordColumnKey Parse(string Input)
+        public static HistoryColumnKey Parse(string Input)
         {
             if (!TryParse(Input, out var RetVal))
                 throw new FormatException("the input string is not valid.");
@@ -119,22 +119,22 @@ namespace Glazer.Nodes.Records
         /// <summary>
         /// Test whether the record key is valid or not.
         /// </summary>
-        public bool IsNull => RecordKey.IsNull || string.IsNullOrWhiteSpace(Column);
+        public bool IsNull => RowKey.IsNull || string.IsNullOrWhiteSpace(Column);
 
         /// <summary>
         /// Login Name who is owner of the record.
         /// </summary>
-        public string Login => RecordKey.Login;
+        public string Login => RowKey.Login;
 
         /// <summary>
         /// Code ID that generated the record.
         /// </summary>
-        public HashValue CodeId => RecordKey.CodeId;
+        public HashValue CodeId => RowKey.CodeId;
 
         /// <summary>
         /// Record Key.
         /// </summary>
-        public RecordKey RecordKey { get; }
+        public HistoryRowKey RowKey { get; }
 
         /// <summary>
         /// Name of the record column.
@@ -142,12 +142,12 @@ namespace Glazer.Nodes.Records
         public string Column { get; }
 
         /// <inheritdoc/>
-        public bool Equals(RecordColumnKey Other)
+        public bool Equals(HistoryColumnKey Other)
         {
             if (IsNull || Other.IsNull)
                 return IsNull == Other.IsNull;
 
-            if (RecordKey != Other.RecordKey)
+            if (RowKey != Other.RowKey)
                 return false;
 
             if (!Column.CaseEquals(Other.Column))
@@ -159,7 +159,7 @@ namespace Glazer.Nodes.Records
         /// <inheritdoc/>
         public override bool Equals(object Obj)
         {
-            if (Obj is RecordColumnKey Key)
+            if (Obj is HistoryColumnKey Key)
                 return Equals(Key);
 
             return base.Equals(Obj);
@@ -169,9 +169,9 @@ namespace Glazer.Nodes.Records
         public override int GetHashCode()
         {
             if (IsNull)
-                return HashCode.Combine(RecordKey.Null, string.Empty);
+                return HashCode.Combine(HistoryRowKey.Null, string.Empty);
 
-            return HashCode.Combine(RecordKey, Column);
+            return HashCode.Combine(RowKey, Column);
         }
 
         /// <inheritdoc/>
@@ -180,7 +180,7 @@ namespace Glazer.Nodes.Records
             if (IsNull)
                 return string.Empty;
 
-            return $"{RecordKey}#{Column}";
+            return $"{RowKey}#{Column}";
         }
     }
 }

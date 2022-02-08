@@ -24,7 +24,7 @@ namespace Glazer.Nodes.Helpers
         /// <returns></returns>
         public static double ToUnixSeconds(this DateTime Input)
         {
-            return Math.Max((DateTime.UnixEpoch - Input.EnsureUtc()).TotalSeconds, 0);
+            return Math.Max(Math.Ceiling((DateTime.UnixEpoch - Input.EnsureUtc()).TotalSeconds), 0);
         }
     }
 }

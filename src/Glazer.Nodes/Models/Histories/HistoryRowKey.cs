@@ -4,29 +4,29 @@ using System;
 
 namespace Glazer.Nodes.Records
 {
-    public struct RecordKey : IEquatable<RecordKey>
+    public struct HistoryRowKey : IEquatable<HistoryRowKey>
     {
         /// <summary>
         /// Null Key that points nothing.
         /// </summary>
-        public static readonly RecordKey Null = new RecordKey();
+        public static readonly HistoryRowKey Null = new HistoryRowKey();
 
         /// <summary>
-        /// Initialize a new <see cref="RecordKey"/> value.
+        /// Initialize a new <see cref="HistoryRowKey"/> value.
         /// </summary>
         /// <param name="Login"></param>
         /// <param name="CodeId"></param>
-        public RecordKey(string Login, HashValue CodeId)
+        public HistoryRowKey(string Login, HashValue CodeId)
         {
             this.Login = Login;
             this.CodeId = CodeId;
         }
 
         /// <summary>
-        /// Initialize a new <see cref="RecordKey"/> value.
+        /// Initialize a new <see cref="HistoryRowKey"/> value.
         /// </summary>
         /// <param name="Input"></param>
-        public RecordKey(string Input)
+        public HistoryRowKey(string Input)
         {
             var Temp = Parse(Input);
 
@@ -35,8 +35,8 @@ namespace Glazer.Nodes.Records
         }
 
         /* Compares two hash values. */
-        public static bool operator ==(RecordKey L, RecordKey R) => L.Equals(R);
-        public static bool operator !=(RecordKey L, RecordKey R) => !L.Equals(R);
+        public static bool operator ==(HistoryRowKey L, HistoryRowKey R) => L.Equals(R);
+        public static bool operator !=(HistoryRowKey L, HistoryRowKey R) => !L.Equals(R);
 
         /// <summary>
         /// Try to parse the <paramref name="Input"/> to <paramref name="Output"/>.
@@ -44,7 +44,7 @@ namespace Glazer.Nodes.Records
         /// <param name="Input"></param>
         /// <param name="Output"></param>
         /// <returns></returns>
-        public static bool TryParse(string Input, out RecordKey Output)
+        public static bool TryParse(string Input, out HistoryRowKey Output)
         {
             var Collon = Input.IndexOf(':');
             if (Collon > 0)
@@ -54,7 +54,7 @@ namespace Glazer.Nodes.Records
 
                 if (HashValue.TryParse(CodeStr, out var CodeId))
                 {
-                    Output = new RecordKey(Login, CodeId);
+                    Output = new HistoryRowKey(Login, CodeId);
                     return true;
                 }
             }
@@ -68,7 +68,7 @@ namespace Glazer.Nodes.Records
         /// </summary>
         /// <param name="Input"></param>
         /// <returns></returns>
-        public static RecordKey Parse(string Input)
+        public static HistoryRowKey Parse(string Input)
         {
             if (!TryParse(Input, out var RetVal))
                 throw new FormatException("the input string is not valid.");
@@ -86,7 +86,7 @@ namespace Glazer.Nodes.Records
         /// </summary>
         /// <param name="ColumnKey"></param>
         /// <returns></returns>
-        public bool IsMemberOf(RecordColumnKey ColumnKey) => Equals(ColumnKey.RecordKey);
+        public bool IsMemberOf(HistoryColumnKey ColumnKey) => Equals(ColumnKey.RowKey);
 
         /// <summary>
         /// Login Name who is owner of the record.
@@ -99,7 +99,7 @@ namespace Glazer.Nodes.Records
         public HashValue CodeId { get; }
 
         /// <inheritdoc/>
-        public bool Equals(RecordKey Other)
+        public bool Equals(HistoryRowKey Other)
         {
             if (IsNull || Other.IsNull)
                 return IsNull == Other.IsNull;
@@ -116,7 +116,7 @@ namespace Glazer.Nodes.Records
         /// <inheritdoc/>
         public override bool Equals(object Obj)
         {
-            if (Obj is RecordKey Key)
+            if (Obj is HistoryRowKey Key)
                 return Equals(Key);
 
             return base.Equals(Obj);

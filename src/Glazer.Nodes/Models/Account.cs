@@ -26,27 +26,6 @@ namespace Glazer.Nodes.Models
         public static readonly Account Empty = new Account();
 
         /// <summary>
-        /// Login Names.
-        /// </summary>
-        public struct KnownLogins
-        {
-            /// <summary>
-            /// System Account.
-            /// </summary>
-            public static readonly string SYSTEM = "glazer";
-
-            /// <summary>
-            /// Token Management Account.
-            /// </summary>
-            public static readonly string TOKENS = "glazer.tokens";
-
-            /// <summary>
-            /// Code Management Account.
-            /// </summary>
-            public static readonly string CODES = "glazer.codes";
-        }
-
-        /// <summary>
         /// Initialize a new <see cref="Account"/> value.
         /// </summary>
         /// <param name="LoginName"></param>

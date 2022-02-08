@@ -83,5 +83,20 @@ namespace Glazer.Nodes.Helpers
 
             return (Field = Initiator()).Value;
         }
+
+        /// <summary>
+        /// Initiate the nullable field as.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Field"></param>
+        /// <param name="Initiator"></param>
+        /// <returns></returns>
+        public static T OnDemand<T>(ref T Field, Func<T> Initiator) where T : class
+        {
+            if (Field != null)
+                return Field;
+
+            return (Field = Initiator());
+        }
     }
 }

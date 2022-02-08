@@ -7,7 +7,7 @@ namespace Glazer.Nodes.Models.Transactions
 {
     public class TransactionBehaviour
     {
-        private Dictionary<RecordColumnKey, byte[]> m_CodeExpects;
+        private Dictionary<HistoryColumnKey, byte[]> m_CodeExpects;
 
         /// <summary>
         /// Code Id to execute.
@@ -30,7 +30,7 @@ namespace Glazer.Nodes.Models.Transactions
         /// Pairs that points a slot.
         /// Empty value is about removal of the slot, otherwise alter(or create).
         /// </summary>
-        public Dictionary<RecordColumnKey, byte[]> CodeExpects
+        public Dictionary<HistoryColumnKey, byte[]> CodeExpects
         {
             get => Ensures(ref m_CodeExpects);
             set => Assigns(ref m_CodeExpects, value);

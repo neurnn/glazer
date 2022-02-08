@@ -2,7 +2,7 @@
 using Glazer.Nodes.Exceptions;
 using Glazer.Nodes.Helpers;
 using Glazer.Nodes.Models;
-using Glazer.Nodes.Records;
+using Glazer.Nodes.Models.Histories;
 using System;
 using System.IO;
 using System.Text;
@@ -142,7 +142,7 @@ namespace Glazer.Nodes.Models.Transactions
             var CodeLength = Reader.Read7BitEncodedInt();
             for (var j = 0; j < CodeLength; ++j)
             {
-                var Key = Reader.ReadRecordColumnKey();
+                var Key = Reader.ReadHistoryColumnKey();
                 var Value = Reader.ReadFrame();
                 Behaviour.CodeExpects[Key] = Value;
             }

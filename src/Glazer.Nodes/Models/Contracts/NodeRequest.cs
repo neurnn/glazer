@@ -1,5 +1,4 @@
 ﻿using Backrole.Crypto;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -7,20 +6,27 @@ using System.Threading.Tasks;
 using static Glazer.Nodes.Helpers.ModelHelpers;
 
 
-namespace Glazer.Nodes.Models.Networks
+namespace Glazer.Nodes.Models.Contracts
 {
     /// <summary>
     /// Request from the remote hosts.
     /// </summary>
-    public class NodeRequest
+    public partial class NodeRequest
     {
         private Dictionary<string, string> m_Headers;
         private Dictionary<string, string> m_Options;
-        private Dictionary<string, byte[]> m_Blobs;
+        private Dictionary<object, object> m_Properties;
 
         private DateTime? m_Expiration;
         private ReplyHandler m_Reply;
         private int m_Replied;
+
+        /// <summary>
+        /// Delegate that handles <see cref="NodeRequest"/> and returns <see cref="NodeResponse"/>.
+        /// </summary>
+        /// <param name="Request"></param>
+        /// <returns></returns>
+        public delegate Task<NodeResponse> Delegate(NodeRequest Request);
 
         /// <summary>
         /// Delegate that invoked by <see cref="ReplyAsync(NodeResponse)"/> method.
@@ -34,7 +40,7 @@ namespace Glazer.Nodes.Models.Networks
         /// Initialize a new <see cref="NodeRequest"/> instance.
         /// </summary>
         /// <param name="Reply"></param>
-        public NodeRequest(ReplyHandler Reply, CancellationToken Aborted)
+        public NodeRequest(ReplyHandler Reply, CancellationToken Aborted = default)
         {
             this.Aborted = Aborted;
 
@@ -43,9 +49,19 @@ namespace Glazer.Nodes.Models.Networks
         }
 
         /// <summary>
+        /// Initialize a new <see cref="NodeRequest"/> instance.
+        /// </summary>
+        /// <param name="Reply"></param>
+        public NodeRequest(CancellationToken Aborted = default)
+        {
+            this.Aborted = Aborted;
+            m_Replied = 0;
+        }
+
+        /// <summary>
         /// Node that accepted this request.
         /// </summary>
-        public Node Node { get; set; }
+        public NodeFeature Node { get; set; }
 
         /// <summary>
         /// Expiration Time of the request.
@@ -76,7 +92,11 @@ namespace Glazer.Nodes.Models.Networks
         /// <summary>
         /// Properties that shared between the request handlers.
         /// </summary>
-        public Dictionary<object, object> Properties { get; } = new Dictionary<object, object>();
+        public Dictionary<object, object> Properties
+        {
+            get => Ensures(ref m_Properties);
+            set => m_Properties = value;
+        }
 
         /// <summary>
         /// Request Headers.
@@ -86,16 +106,6 @@ namespace Glazer.Nodes.Models.Networks
             get => Ensures(ref m_Headers);
             set => Assigns(ref m_Headers, value);
         }
-
-        /// <summary>
-        /// Path to invoke.
-        /// </summary>
-        public string Path { get; set; }
-
-        /// <summary>
-        /// Method of the request.
-        /// </summary>
-        public string Method { get; set; }
 
         /// <summary>
         /// Query parameters.
@@ -117,18 +127,9 @@ namespace Glazer.Nodes.Models.Networks
         public SignValue SenderSign { get; set; }
 
         /// <summary>
-        /// Data Blobs that sent with request body.
+        /// Request Message instance.
         /// </summary>
-        public Dictionary<string, byte[]> Blobs
-        {
-            get => Ensures(ref m_Blobs);
-            set => Assigns(ref m_Blobs, value);
-        }
-
-        /// <summary>
-        /// Request Body instance.
-        /// </summary>
-        public JObject Body { get; set; }
+        public object Message { get; set; }
 
         /// <summary>
         /// Reply the response to the remote host.

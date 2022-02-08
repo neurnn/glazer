@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Glazer.Nodes.Helpers
 {
@@ -57,6 +58,32 @@ namespace Glazer.Nodes.Helpers
         {
             lock (Any)
                 return Field;
+        }
+
+        /// <summary>
+        /// Invokes the getter with lock keyword.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Any"></param>
+        /// <param name="Getter"></param>
+        /// <returns></returns>
+        public static U Locked<T, U>(this T Any, Func<T, U> Getter)
+        {
+            lock (Any)
+                return Getter(Any);
+        }
+
+        /// <summary>
+        /// Invokes an action with lock keyword.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Any"></param>
+        /// <param name="Action"></param>
+        /// <returns></returns>
+        public static void Locked<T>(this T Any, Action<T> Action)
+        {
+            lock (Any)
+                Action(Any);
         }
     }
 }

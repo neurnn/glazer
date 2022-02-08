@@ -1,20 +1,21 @@
 ﻿using Backrole.Crypto;
 using Glazer.Nodes.Models.Blocks;
+using Glazer.Nodes.Records;
 using System;
 
-namespace Glazer.Nodes.Records
+namespace Glazer.Nodes.Models.Histories
 {
-    public struct RecordColumn
+    public struct HistoryColumn
     {
         /// <summary>
-        /// Initialize a new <see cref="RecordColumn"/> value.
+        /// Initialize a new <see cref="HistoryColumn"/> value.
         /// </summary>
         /// <param name="ColumnKey"></param>
         /// <param name="TimeStamp"></param>
         /// <param name="BlockIndex"></param>
         /// <param name="TrxId"></param>
         /// <param name="BlobData"></param>
-        public RecordColumn(RecordColumnKey ColumnKey, DateTime TimeStamp,
+        public HistoryColumn(HistoryColumnKey ColumnKey, DateTime TimeStamp,
             BlockIndex BlockIndex, HashValue TrxId, byte[] BlobData)
         {
             if (TimeStamp.Kind != DateTimeKind.Utc)
@@ -30,12 +31,12 @@ namespace Glazer.Nodes.Records
         /// <summary>
         /// Key that points the record itself.
         /// </summary>
-        public RecordKey RecordKey => ColumnKey.RecordKey;
+        public HistoryRowKey RowKey => ColumnKey.RowKey;
 
         /// <summary>
         /// Key that points the record's column.
         /// </summary>
-        public RecordColumnKey ColumnKey { get; }
+        public HistoryColumnKey ColumnKey { get; }
 
         /// <summary>
         /// Block Index that this record stored.
