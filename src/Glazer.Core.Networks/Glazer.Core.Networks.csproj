@@ -5,7 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Internals\Services\" />
+    <ProjectReference Include="..\Glazer.Core\Glazer.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Internals\" />
   </ItemGroup>
 
 </Project>

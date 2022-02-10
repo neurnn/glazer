@@ -1,0 +1,41 @@
+﻿{
+	"p2p": {
+		"endpoint": {
+			"address": "0.0.0.0",
+			"port": 7000
+		},
+		"timeouts": {
+			"connect": 5,
+			"recovery": 30
+		},
+		"tick": 0.15,
+		"peers": [
+			"127.0.0.1:7001",
+			"127.0.0.1:7002"
+		]
+	},
+
+	"http": {
+		"address": "0.0.0.0",
+		"port": 8080,
+		"cors": "enabled"
+	},
+
+	"discovery": {
+		"ads": {
+			"address": "127.0.0.1",
+			"port": 7000
+		},
+		"max_ttl": 16,
+		"seeds": [
+		]
+	},
+
+	"node": {
+		"chain_id": "d032524e-70f0-4063-ae5e-cb4d6482607e",
+		"data_dir": "./data",
+		"login": "glazer.sys",
+		"pub_key": "PUB/XnACDEmaynW1YCdWFsoqvHbPbiabxstRZ526w3iWyPtNzBr29ybwpnBVRJqkZEDzir5HxYSFnwxthgciV42Rnyca6DrLK",
+		"pvt_key": "PVT/2FzH1H6yhr5wQT5cn4U5VCEe1CUbwy5rV5jrtFUkob2tw88mnY"
+	}
+}
