@@ -18,15 +18,5 @@ namespace Glazer.Core
         /// Key Pair to sign as configured account.
         /// </summary>
         SignKeyPair KeyPair { get; }
-
-        /// <summary>
-        /// Genesis Block.
-        /// </summary>
-        Block Genesis { get; }
-
-        /// <summary>
-        /// Indicates whether the local node is running as genesis mode or not.
-        /// </summary>
-        bool IsGenesisMode { get; }
     }
 }

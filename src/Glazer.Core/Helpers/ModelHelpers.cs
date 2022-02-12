@@ -46,7 +46,7 @@ namespace Glazer.Core.Helpers
         /// <returns></returns>
         public static T Assigns<T>(ref T Field, T Input)
         {
-            if (!Field.Equals(Input))
+            if (Field is null || !Field.Equals(Input))
                 Field = Input;
 
             return Input;

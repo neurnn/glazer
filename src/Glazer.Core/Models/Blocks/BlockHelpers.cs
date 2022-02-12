@@ -1,4 +1,5 @@
 ﻿using Backrole.Crypto;
+using Backrole.Orp.Utilities;
 using Glazer.Core.Exceptions;
 using Glazer.Core.Helpers;
 using Glazer.Core.Models.Chains;
@@ -230,7 +231,7 @@ namespace Glazer.Core.Models.Blocks
         public static HashValue MakeHashValue(this Block Block, BlockPackingOptions Options = default)
         {
             using var Stream = new MemoryStream();
-            using (var Writer = new BinaryWriter(Stream))
+            using (var Writer = new EndianessWriter(Stream, null, true, true))
                 Writer.Write(Block, Options);
 
             Stream.Position = 0;

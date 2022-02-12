@@ -16,16 +16,18 @@ namespace Glazer.Core.Nodes.Services
 {
     public class BlockRepository : IBlockRepository
     {
-        private InternalBlockRepository m_LocalCopy;
+        private BlockRepositoryInternal m_LocalCopy;
         private BlockIndex m_LastBlockIndex = default;
+        private NodeNetwork m_Network;
 
         /// <summary>
         /// Initialize a new <see cref="BlockRepository"/> instance.
         /// </summary>
         /// <param name="Settings"></param>
-        public BlockRepository(IOptions<LocalNodeSettings> Settings)
+        public BlockRepository(IOptions<LocalNodeSettings> Settings, NodeNetwork Network)
         {
-            m_LocalCopy = new InternalBlockRepository(Settings);
+            m_LocalCopy = new BlockRepositoryInternal(Settings);
+            m_Network = Network;
         }
 
         /// <summary>
@@ -44,8 +46,9 @@ namespace Glazer.Core.Nodes.Services
             var Block = await m_LocalCopy.GetAsync(BlockIndex, Token);
             if (Block is null)
             {
-                if (BlockIndex == BlockIndex.Genesis)
+                if (BlockIndex <= BlockIndex.Genesis)
                     return null;
+
                 // Request to other node.
             }
 

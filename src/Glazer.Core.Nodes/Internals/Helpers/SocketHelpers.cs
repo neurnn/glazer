@@ -28,7 +28,7 @@ namespace Glazer.Core.Nodes.Internals.Helpers
                 int ReceivedBytes;
 
                 try { ReceivedBytes = await Socket.ReceiveAsync(Buffer, SocketFlags.None, Token); }
-                catch
+                catch(Exception e)
                 {
                     if (!Token.IsCancellationRequested && Socket.Connected)
                         continue;

@@ -13,8 +13,8 @@ using System.Threading.Tasks;
 
 namespace Glazer.Core.Nodes.Internals.Messages
 {
-    [NodeMessage("welcome")]
-    internal class Welcome : IMessage
+    [NodeMessage("hello")]
+    internal class Hello : IMessage
     {
         /// <summary>
         /// Chain information.
@@ -42,34 +42,5 @@ namespace Glazer.Core.Nodes.Internals.Messages
             ChainInfo = Reader.ReadChainInfo(ChainInfo);
             Assignment = Reader.ReadFrame();
         }
-    }
-
-    [NodeMessage("welcome.reply")]
-    internal class WelcomeReply : IMessage
-    {
-        /// <summary>
-        /// Account Information.
-        /// </summary>
-        public Account Account { get; set; }
-
-        /// <summary>
-        /// Sign Value that generated for <see cref="Welcome.Assignment"/>.
-        /// </summary>
-        public SignValue SignValue { get; set; }
-
-        /// <inheritdoc/>
-        public void Encode(BinaryWriter Writer)
-        {
-            Writer.Write(Account);
-            Writer.Write(SignValue);
-        }
-
-        /// <inheritdoc/>
-        public void Decode(BinaryReader Reader)
-        {
-            Account = Reader.ReadAccount();
-            SignValue = Reader.ReadSignValue();
-        }
-
     }
 }

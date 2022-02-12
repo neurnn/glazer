@@ -11,15 +11,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Node Features", "02. No
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.Core", "src\Glazer.Core\Glazer.Core.csproj", "{BB0CB2F2-6F1C-413D-BE43-4BEB8FC122C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.Node", "src\Glazer.Node\Glazer.Node.csproj", "{E115D8A9-2A72-4C47-AF6D-0FC876D9B4BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.Node", "src\Glazer.Node\Glazer.Node.csproj", "{E115D8A9-2A72-4C47-AF6D-0FC876D9B4BE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Node", "02. Node", "{F4F37FD2-AEA3-495E-B4E7-C43A8DC5664B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Utilities", "02. Utilities", "{43EC187A-F809-4349-9937-2F71B3BBBD3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "glkey", "src\glkey\glkey.csproj", "{4774E7EA-CEE9-40F9-B86E-93EC45AD6FC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "glkey", "src\glkey\glkey.csproj", "{4774E7EA-CEE9-40F9-B86E-93EC45AD6FC5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.Core.Nodes", "src\Glazer.Core.Nodes\Glazer.Core.Nodes.csproj", "{97AF076C-843A-4B33-B44A-E3AFE5B4670B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cligl", "src\cligl\cligl.csproj", "{A9947291-4DB7-464E-993F-DA18A62749B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{97AF076C-843A-4B33-B44A-E3AFE5B4670B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97AF076C-843A-4B33-B44A-E3AFE5B4670B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97AF076C-843A-4B33-B44A-E3AFE5B4670B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9947291-4DB7-464E-993F-DA18A62749B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9947291-4DB7-464E-993F-DA18A62749B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9947291-4DB7-464E-993F-DA18A62749B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9947291-4DB7-464E-993F-DA18A62749B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,6 +61,7 @@ Global
 		{F4F37FD2-AEA3-495E-B4E7-C43A8DC5664B} = {FBBDA8F0-23ED-4705-8740-A46F75221F18}
 		{4774E7EA-CEE9-40F9-B86E-93EC45AD6FC5} = {43EC187A-F809-4349-9937-2F71B3BBBD3A}
 		{97AF076C-843A-4B33-B44A-E3AFE5B4670B} = {0D412500-7D79-49A6-846C-2C492B51303A}
+		{A9947291-4DB7-464E-993F-DA18A62749B5} = {43EC187A-F809-4349-9937-2F71B3BBBD3A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0EEE934C-CAC9-4DFE-996F-B71C95FE7A38}

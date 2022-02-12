@@ -1,4 +1,5 @@
 ﻿using Glazer.Core.Models.Blocks;
+using Glazer.Core.Nodes.Internals.Messages;
 using Glazer.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -13,23 +14,43 @@ namespace Glazer.Core.Nodes.Internals.Remotes
     internal class BlockRepository : IBlockRepository
     {
         private static readonly Task<HttpStatusCode> FORBIDDEN = Task.FromResult(HttpStatusCode.Forbidden);
+        private RemoteNodeSender m_Sender;
+        private ILocalNode m_LocalNode;
 
         /// <summary>
         /// Initialize a new <see cref="BlockRepository"/> instance.
         /// </summary>
-        /// <param name="Node"></param>
-        public BlockRepository(RemoteNode Node)
+        /// <param name="Sender"></param>
+        public BlockRepository(ILocalNode Node, RemoteNodeSender Sender)
         {
-
+            m_Sender = Sender;
+            m_LocalNode = Node;
         }
 
-        public BlockIndex LastBlockIndex => throw new NotImplementedException();
+        /// <summary>
+        /// Last Block Index.
+        /// </summary>
+        public BlockIndex LastBlockIndex { get; private set; } = BlockIndex.Invalid;
 
-        public Task<Block> GetAsync(BlockIndex BlockIndex, CancellationToken Token)
+        /// <inheritdoc/>
+        public async Task<Block> GetAsync(BlockIndex BlockIndex, CancellationToken Token)
         {
-            throw new NotImplementedException();
+            if ((await m_Sender.Request(new GetBlock { BlockIndex = BlockIndex }, Token)) is GetBlockReply Reply)
+            {
+                if (Reply.Result)
+                {
+                    LastBlockIndex 
+                        = BlockIndex > LastBlockIndex
+                        ? BlockIndex : LastBlockIndex;
+
+                    return Reply.Block;
+                }
+            }
+
+            return null;
         }
 
+        /// <inheritdoc/>
         public Task<HttpStatusCode> PutAsync(Block Block, CancellationToken Token) => FORBIDDEN;
     }
 }

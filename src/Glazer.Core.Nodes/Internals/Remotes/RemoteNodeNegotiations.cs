@@ -45,25 +45,31 @@ namespace Glazer.Core.Nodes.Internals.Remotes
                 var Settings = LocalNode.GetRequiredService<IOptions<LocalNodeSettings>>().Value;
 
                 var Blocks = LocalNode.GetRequiredService<IBlockRepository>();
-                var Accounts = LocalNode.GetRequiredService<IAccountManager>();
+                var Accounts = LocalNode.GetService<IAccountManager>();
 
-                var Genesis = await Blocks.GetAsync(BlockIndex.Genesis, Token);
-                if (Genesis is null || Accounts is null) /* --> if no genesis performed, no negotiate. */
+                var Genesis = LocalNode.GetRequiredService<GenesisStatus>();
+
+                var GenesisBlock = await Genesis.Completion;
+                if (GenesisBlock is null/* || Accounts is null*/) /* --> if no genesis performed, no negotiate. */
                     return;
 
-                var Request = new Welcome
+                var Request = new Hello
                 {
                     ChainInfo = new ChainInfo
                     {
                         Version = 0,
                         ChainId = Settings.ChainId,
-                        GenesisKey = Genesis.Header.Producer.PublicKey,
-                        GenesisTimeStamp = Genesis.Header.TimeStamp
+                        GenesisKey = GenesisBlock.Header.Producer.PublicKey,
+                        GenesisTimeStamp = GenesisBlock.Header.TimeStamp
                     }
                 };
 
                 /* If the reply is not WelcomeReply, */
-                if ((await m_Sender.Request(Request, Token)) is not WelcomeReply Reply)
+                if ((await m_Sender.Request(Request, Token)) is not HelloReply Reply)
+                    return;
+
+                /* No connect to self. */
+                if (Reply.Account == LocalNode.Account)
                     return;
 
                 /* Check the account exists or not. */
@@ -87,7 +93,7 @@ namespace Glazer.Core.Nodes.Internals.Remotes
         /// </summary>
         /// <param name="Request"></param>
         /// <returns></returns>
-        public async Task<WelcomeReply> OnNegotiation(Welcome Request)
+        public async Task<HelloReply> OnNegotiation(Hello Request)
         {
             lock(this)
             {
@@ -101,7 +107,6 @@ namespace Glazer.Core.Nodes.Internals.Remotes
             }
 
             var Token = m_Node.GetRequiredService<CancellationToken>();
-
             var LocalNode = m_Node.GetRequiredService<ILocalNode>();
             var Settings = LocalNode.GetRequiredService<IOptions<LocalNodeSettings>>().Value;
 
@@ -122,7 +127,7 @@ namespace Glazer.Core.Nodes.Internals.Remotes
             if (Request.ChainInfo.GenesisTimeStamp != Genesis.Header.TimeStamp)
                 return null;
 
-            return new WelcomeReply /* --> Reply about the local node. */
+            return new HelloReply /* --> Reply about the local node. */
             {
                 Account = new Account(Settings.Login, Settings.KeyPair.PublicKey),
                 SignValue = Settings.KeyPair.Sign(Request.Assignment)

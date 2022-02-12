@@ -15,23 +15,23 @@ using System.Threading.Tasks;
 
 namespace Glazer.Core.Nodes.Services.Internals
 {
-    internal class InternalBlockRepository : IBlockRepository
+    internal class BlockRepositoryInternal : IBlockRepository
     {
         private static readonly Task<Block> NOT_FOUND = Task.FromResult<Block>(null);
 
         private static readonly Task<HttpStatusCode> STATUS_OK = Task.FromResult(HttpStatusCode.OK);
         private static readonly Task<HttpStatusCode> STATUS_ERR = Task.FromResult(HttpStatusCode.InternalServerError);
 
-        private (ulong Key, InternalBlockDataSlots Slots)[] m_Partitions;
+        private (ulong Key, BlockDataSlots Slots)[] m_Partitions;
 
         private const int MGMT_SLOT_MAX_L32 = 0, MGMT_SLOT_MAX_H32 = 1;
-        private InternalBlockDataSlots m_Managements;
+        private BlockDataSlots m_Managements;
 
         /// <summary>
-        /// Initialize a new <see cref="InternalBlockRepository"/> instance.
+        /// Initialize a new <see cref="BlockRepositoryInternal"/> instance.
         /// </summary>
         /// <param name="Settings"></param>
-        public InternalBlockRepository(IOptions<LocalNodeSettings> Settings)
+        public BlockRepositoryInternal(IOptions<LocalNodeSettings> Settings)
         {
             var FullPath = Path.Combine(Settings.Value.DataDirectory.FullName, "blocks");
             if (!(DataDir = new DirectoryInfo(FullPath)).Exists)
@@ -40,7 +40,7 @@ namespace Glazer.Core.Nodes.Services.Internals
                 DataDir.Refresh();
             }
 
-            if ((m_Managements = new InternalBlockDataSlots(Path.Combine(DataDir.FullName, "info"))).IsCreatedNow)
+            if ((m_Managements = new BlockDataSlots(Path.Combine(DataDir.FullName, "info"))).IsCreatedNow)
             {
                 m_Managements.Set(MGMT_SLOT_MAX_L32, BitConverter.GetBytes(uint.MinValue));
                 m_Managements.Set(MGMT_SLOT_MAX_H32, BitConverter.GetBytes(uint.MinValue));
@@ -54,7 +54,7 @@ namespace Glazer.Core.Nodes.Services.Internals
                 LastBlockIndex = new BlockIndex(H32, L32);
             }
 
-            m_Partitions = new (ulong Key, InternalBlockDataSlots Slots)[Settings.Value.MaxLivePartitions];
+            m_Partitions = new (ulong Key, BlockDataSlots Slots)[Settings.Value.MaxLivePartitions];
         }
 
         /// <summary>
@@ -66,12 +66,12 @@ namespace Glazer.Core.Nodes.Services.Internals
         public BlockIndex LastBlockIndex { get; private set; }
 
         /// <summary>
-        /// Get <see cref="InternalBlockDataSlots"/> instance.
+        /// Get <see cref="BlockDataSlots"/> instance.
         /// </summary>
         /// <param name="Index"></param>
         /// <param name="L"></param>
         /// <returns></returns>
-        private InternalBlockDataSlots GetPartition(BlockIndex Index, out uint L)
+        private BlockDataSlots GetPartition(BlockIndex Index, out uint L)
         {
             BlockIndex.MakePartitionNumbers(Index, out var S, out var P, out L);
             var Key = (ulong)S << 32 | P;
@@ -97,14 +97,14 @@ namespace Glazer.Core.Nodes.Services.Internals
             }
 
             var Name = Path.Combine(DataDir.FullName, $"slots.{Key.ToString("x14")}");
-            if (Empty < 0)
+            if (Empty >= 0)
             {
-                m_Partitions[Empty] = (Key, new InternalBlockDataSlots(Name));
+                m_Partitions[Empty] = (Key, new BlockDataSlots(Name));
                 return m_Partitions[Empty].Slots;
             }
 
             m_Partitions[Early].Slots.Dispose();
-            m_Partitions[Early] = (Key, new InternalBlockDataSlots(Name));
+            m_Partitions[Early] = (Key, new BlockDataSlots(Name));
             return m_Partitions[Early].Slots;
         }
 

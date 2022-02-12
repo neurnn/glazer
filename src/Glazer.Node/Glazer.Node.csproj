@@ -15,6 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="glnode.sync3.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="glnode.sync.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

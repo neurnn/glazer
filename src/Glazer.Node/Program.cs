@@ -12,6 +12,7 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Glazer.Node
 {
@@ -28,7 +29,9 @@ namespace Glazer.Node
                 .Configure<NodeArguments>((_, Options) =>
                 {
                     Options.AddRange(Args);
-                    Options.Add("--genesis");
+
+                    if (Debugger.IsAttached)
+                        Options.Add("--genesis");
                 })
 
                 .ConfigureConfigurations(Configs =>
@@ -44,14 +47,13 @@ namespace Glazer.Node
                     }
 
                     Configs
-                        .AddEnvironmentVariables()
+                        //.AddEnvironmentVariables()
                         .AddJsonFile(Name, Options => Options.AsLowerCase = true);
                 })
 
                 .Configure<HttpSettings>((Configs, Http) => Http.From(Configs))
                 .Configure<LocalNodeSettings>((Configs, LocalNode) => LocalNode.From(Configs))
-                .Configure<DiscoverySettings>((Configs, Discovery) => Discovery.From(Configs))
-                .Configure<PeerNetworkSettings>((Configs, PeerNetwork) => PeerNetwork.From(Configs))
+                .Configure<NodeNetworkSettings>((Configs, PeerNetwork) => PeerNetwork.From(Configs))
 
                 .ConfigureLoggings(Loggings =>
                 {
@@ -65,6 +67,7 @@ namespace Glazer.Node
                 .ConfigureServices(Services =>
                 {
                     LocalNode.SetServices(Services);
+                    NodeNetwork.SetServices(Services);
 
                     Services
                         .AddSingleton<MessageMapper>(X =>

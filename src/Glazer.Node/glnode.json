@@ -1,34 +1,24 @@
 ﻿{
 	"p2p": {
-		"endpoint": {
-			"address": "0.0.0.0",
-			"port": 7000
-		},
+		"endpoint": "0.0.0.0:7000",
 		"timeouts": {
 			"connect": 5,
 			"recovery": 30
 		},
-		"tick": 0.15,
 		"peers": [
 			"127.0.0.1:7001",
 			"127.0.0.1:7002"
-		]
+		],
+		"discovery": {
+			"advertise": "127.0.0.1:7000",
+			"interval": 15,
+			"ttl": 16
+		}
 	},
 
 	"http": {
-		"address": "0.0.0.0",
-		"port": 8080,
+		"endpoint": "0.0.0.0:8080",
 		"cors": "enabled"
-	},
-
-	"discovery": {
-		"ads": {
-			"address": "127.0.0.1",
-			"port": 7000
-		},
-		"max_ttl": 16,
-		"seeds": [
-		]
 	},
 
 	"node": {

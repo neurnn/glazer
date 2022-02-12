@@ -43,6 +43,11 @@ namespace Glazer.Core.Nodes
         public bool GenesisMode { get; set; }
 
         /// <summary>
+        /// Genesis Mode but, synchronize it from other nodes.
+        /// </summary>
+        public bool GenesisSyncMode { get; set; }
+
+        /// <summary>
         /// Node Execution Arguments.
         /// </summary>
         [ServiceInjection(Required = true)]
@@ -82,7 +87,8 @@ namespace Glazer.Core.Nodes
                 DataDirectory.Refresh();
             }
 
-            GenesisMode = m_Arguments.Value.Contains("--genesis");
+            GenesisSyncMode = m_Arguments.Value.Contains("--genesis-sync");
+            GenesisMode = m_Arguments.Value.Contains("--genesis") || GenesisSyncMode;
             return this;
         }
     }

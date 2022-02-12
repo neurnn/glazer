@@ -1,7 +1,6 @@
 ﻿using Backrole.Core;
 using Backrole.Core.Abstractions;
 using Backrole.Crypto;
-using Glazer.Core.Nodes.Internals;
 using Glazer.Core.Nodes.Internals.Messages;
 using Glazer.Core.Nodes.Services;
 using Glazer.Core.Nodes.Services.Internals;
@@ -13,13 +12,17 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Backrole.Core.Hosting;
+using Glazer.Core.Nodes.Internals;
+using System.Linq;
+using System.Reflection;
+using Glazer.Core.Notations;
 
 namespace Glazer.Core.Nodes
 {
     public class LocalNode : BackgroundService, ILocalNode
     {
+        private NodeStatus m_Status;
         private IServiceProvider m_Services = null;
-        private IBlockRepository m_BlockRepository = null;
         private ILogger m_Logger = null;
 
         /// <summary>
@@ -31,13 +34,16 @@ namespace Glazer.Core.Nodes
             var Settings = Options.Value;
 
             m_Logger = (m_Services = Services).GetService<ILogger<ILocalNode>>();
-            m_BlockRepository = m_Services.GetRequiredService<IBlockRepository>();
-            m_Services.GetService<MessageMapper>().Map(typeof(LocalNode).Assembly);
+            m_Services.GetService<MessageMapper>()
+                .Map(
+                    typeof(LocalNode).Assembly.GetTypes()
+                        .Where(X => X.GetCustomAttribute<NodeMessageAttribute>() != null)
+                        .ToArray()
+                );
 
             ChainId = Settings.ChainId;
             KeyPair = Settings.KeyPair;
             Account = new Account(Settings.Login, KeyPair.PublicKey);
-            IsGenesisMode = Settings.GenesisMode;
         }
 
         /// <summary>
@@ -62,10 +68,13 @@ namespace Glazer.Core.Nodes
 
             if (Services.Find<IBlockRepository>() is null)
                 Services.AddSingleton<IBlockRepository, BlockRepository>();
+
+            Services.AddHostedService<DiscoveryService>();
+            Services.AddSingleton<GenesisStatus>();
         }
 
         /// <inheritdoc/>
-        public NodeStatus Status => NodeStatus.Connected;
+        public NodeStatus Status => m_Status;
 
         /// <inheritdoc/>
         public event Action<INode> StatusChanged; // --> unused.
@@ -82,35 +91,81 @@ namespace Glazer.Core.Nodes
         /// <inheritdoc/>
         public SignKeyPair KeyPair { get; }
 
-        /// <summary>
-        /// Genesis Block.
-        /// </summary>
-        public Block Genesis { get; private set; }
-
-        /// <inheritdoc/>
-        public bool IsGenesisMode { get; }
-
         /// <inheritdoc/>
         public object GetService(Type ServiceType) => m_Services.GetService(ServiceType);
+
+        /// <summary>
+        /// Set the node status.
+        /// </summary>
+        /// <param name="Status"></param>
+        internal void SetStatus(NodeStatus Status)
+        {
+            lock (this)
+            {
+                if (Status == m_Status)
+                    return;
+
+                m_Status = Status;
+            }
+
+            ThreadPool.QueueUserWorkItem(_ => StatusChanged?.Invoke(this));
+        }
 
         /// <inheritdoc/>
         protected override async Task RunAsync(CancellationToken Token)
         {
-            if ((Genesis = await m_BlockRepository.GetAsync(BlockIndex.Genesis, Token)) is null)
-            {
-                if (!IsGenesisMode)
-                {
-                    m_Logger.Fatal(
-                        "the node has not genesis performed. please execute the node once with `--genesis` option.\n" +
-                        "it will create the genesis block using your key or, synchronize the genesis block from the network.\n" +
-                        "but note that, if the genesis block created by your key, it can not be interact with glazer network.\n" +
-                        "to synchronize the genesis block from the network, do NOT specify `node:pvt_key' on `glnode.json` file.");
+            var Network = m_Services.GetRequiredService<NodeNetwork>();
+            var Status = m_Services.GetRequiredService<GenesisStatus>();
 
-                    m_Services.GetRequiredService<IHostLifetime>().Stop();
-                    return;
-                }
+            SetStatus(NodeStatus.Connecting);
+            Network
+                .ListenRequest(OnRequest)
+                .Run();
+
+            await Status.InitiateAsync(Token);
+            try
+            {
+
+            }
+
+            finally
+            {
+                SetStatus(NodeStatus.Disconnected);
             }
         }
 
+        /// <summary>
+        /// Called when the node received the request.
+        /// </summary>
+        /// <param name="Node"></param>
+        /// <param name="Request"></param>
+        /// <returns></returns>
+        private async Task<object> OnRequest(INode Node, object Message)
+        {
+            /* GetBlock request about genesis is allowed even under negotiation. */
+            if (Message is GetBlock GetBlock && GetBlock.BlockIndex == BlockIndex.Genesis)
+            {
+                var Token = Node.GetRequiredService<CancellationToken>();
+                var LocalNode = m_Services.GetRequiredService<ILocalNode>();
+                var Genesis = m_Services.GetRequiredService<GenesisStatus>();
+
+                var Tcs = new TaskCompletionSource();
+                using (Token.Register(Tcs.SetResult))
+                {
+                    await Task.WhenAny(Genesis.Completion, Tcs.Task);
+                    if (Tcs.Task.IsCompleted)
+                        return null;
+
+                    var Block = await Genesis.Completion;
+                    return new GetBlockReply
+                    {
+                        Block = Block,
+                        Result = Block != null
+                    };
+                }
+            }
+
+            return null;
+        }
     }
 }

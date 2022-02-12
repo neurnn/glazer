@@ -65,7 +65,12 @@ namespace Glazer.Core.Nodes.Internals.Remotes
                         {
                             case 0x00: continue;
                             case 0x01: /* Request. */
-                                ThreadPool.QueueUserWorkItem(_ => _ = DispatchRequest(Sender, Guid, Message));
+
+                                ThreadPool.QueueUserWorkItem(_ =>
+                                {
+                                    DispatchRequest(Sender, Guid, Message)
+                                        .GetAwaiter().GetResult();
+                                });
                                 break;
 
                             case 0x02: /* Response. */

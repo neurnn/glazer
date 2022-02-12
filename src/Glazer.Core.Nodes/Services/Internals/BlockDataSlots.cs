@@ -8,7 +8,7 @@ namespace Glazer.Core.Nodes.Services.Internals
     /// <summary>
     /// Stores values using its index.
     /// </summary>
-    internal class InternalBlockDataSlots : IDisposable
+    internal class BlockDataSlots : IDisposable
     {
         private SQLiteConnection m_Sqlite;
         private const string STMT_INIT =
@@ -24,10 +24,10 @@ namespace Glazer.Core.Nodes.Services.Internals
             "SELECT v FROM kv WHERE k = @kk LIMIT 1";
 
         /// <summary>
-        /// Initialize a new <see cref="InternalBlockDataSlots"/> instance.
+        /// Initialize a new <see cref="BlockDataSlots"/> instance.
         /// </summary>
         /// <param name="FullPath"></param>
-        public InternalBlockDataSlots(string FullPath)
+        public BlockDataSlots(string FullPath)
         {
             if (!File.Exists(FullPath))
             {
@@ -98,7 +98,7 @@ namespace Glazer.Core.Nodes.Services.Internals
         }
 
         /// <summary>
-        /// Dispose the <see cref="InternalBlockDataSlots"/> and internal SQLite connection.
+        /// Dispose the <see cref="BlockDataSlots"/> and internal SQLite connection.
         /// </summary>
         public void Dispose() => m_Sqlite.Dispose();
     }

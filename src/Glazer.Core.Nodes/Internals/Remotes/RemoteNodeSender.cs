@@ -49,6 +49,7 @@ namespace Glazer.Core.Nodes.Internals.Remotes
                 return null;
             }
 
+            var Released = false;
             Guid NewId = SetRedirect(out var Redirect, out var TaskResult);
             try
             {
@@ -61,12 +62,24 @@ namespace Glazer.Core.Nodes.Internals.Remotes
                     m_Mapper.Encode(Writer, Message);
                 }
 
-                if (await SendBytes(Stream.ToArray()))
-                {
-                    if ((Message = await TaskResult) is null)
-                        Token.ThrowIfCancellationRequested();
+                var Packet = Stream.ToArray();
+                var LengthBytes = BitConverter.GetBytes(Packet.Length);
 
-                    return Message;
+                if (!BitConverter.IsLittleEndian)
+                     Array.Reverse(LengthBytes);
+
+                if (await SendBytes(LengthBytes.Concat(Packet).ToArray()))
+                {
+                    using (Token.Register(() => Redirect(null)))
+                    {
+                        Released = true;
+                        m_Semaphore.Release();
+
+                        if ((Message = await TaskResult) is null)
+                            Token.ThrowIfCancellationRequested();
+
+                        return Message;
+                    }
                 }
 
                 return null;
@@ -75,7 +88,8 @@ namespace Glazer.Core.Nodes.Internals.Remotes
             finally
             {
                 Redirect(null);
-                m_Semaphore.Release();
+                if (!Released)
+                    m_Semaphore.Release();
             }
         }
 
@@ -165,7 +179,13 @@ namespace Glazer.Core.Nodes.Internals.Remotes
 
                 }
 
-                await SendBytes(Stream.ToArray());
+                var Packet = Stream.ToArray();
+                var LengthBytes = BitConverter.GetBytes(Packet.Length);
+
+                if (!BitConverter.IsLittleEndian)
+                    Array.Reverse(LengthBytes);
+
+                await SendBytes(LengthBytes.Concat(Packet).ToArray());
             }
             finally
             {

@@ -57,7 +57,8 @@ namespace Glazer.Core.Helpers
             if (TimeStamp.Kind != DateTimeKind.Utc)
                 TimeStamp = TimeStamp.ToUniversalTime();
 
-            Writer.Write((TimeStamp - DateTime.UnixEpoch).TotalSeconds);
+            var Seconds = (TimeStamp - DateTime.UnixEpoch).TotalSeconds;
+            Writer.Write(Math.Ceiling(Seconds * 100) / 100);
         }
 
         /// <summary>

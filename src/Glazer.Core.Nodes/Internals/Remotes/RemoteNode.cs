@@ -2,6 +2,7 @@
 using Backrole.Core.Abstractions;
 using Backrole.Core.Abstractions.Defaults;
 using Glazer.Core.Models;
+using Glazer.Core.Models.Blocks;
 using Glazer.Core.Nodes.Internals.Messages;
 using Glazer.Core.Services;
 using System;
@@ -25,6 +26,8 @@ namespace Glazer.Core.Nodes.Internals.Remotes
 
         private NodeStatus m_Status;
         private Account m_Account;
+
+        private Func<INode, object, Task<object>> m_Listener;
 
         /// <summary>
         /// Initialize a new <see cref="TcpClient"/> instance.
@@ -121,6 +124,15 @@ namespace Glazer.Core.Nodes.Internals.Remotes
         }
 
         /// <summary>
+        /// Set the listener delegate.
+        /// </summary>
+        /// <param name="Listener"></param>
+        internal void SetListener(Func<INode, object, Task<object>> Listener)
+        {
+            m_Listener = Listener;
+        }
+
+        /// <summary>
         /// Run the remote node's receive loop.
         /// </summary>
         /// <param name="Tcp"></param>
@@ -163,58 +175,18 @@ namespace Glazer.Core.Nodes.Internals.Remotes
         /// <returns></returns>
         internal async Task<object> OnRequest(object Message)
         {
-            /* Negotiation `Welcome` message. */
-            if (Message is Welcome Welcome)
+            /* Negotiation `Hello` message. */
+            if (Message is Hello Hello)
             {
-                var Negotiation = m_Services
-                    .GetRequiredService<RemoteNodeNegotiations>();
-
-                return await Negotiation.OnNegotiation(Welcome);
+                return await m_Services
+                    .GetRequiredService<RemoteNodeNegotiations>()
+                    .OnNegotiation(Hello);
             }
 
-            /* No execution if not connected. */
-            if (!await WaitStatusAsync())
-                return null;
+            if (m_Listener != null)
+                return await m_Listener(this, Message);
 
             return null;
-        }
-
-        /// <summary>
-        /// Wait for the node status (<see cref="NodeStatus.Connected"/>).
-        /// </summary>
-        /// <returns></returns>
-        private async Task<bool> WaitStatusAsync()
-        {
-            if (Status != NodeStatus.Connected)
-            {
-                var Tcs = new TaskCompletionSource();
-                var Token = m_Services.GetRequiredService<CancellationToken>();
-
-                void OnStatusChanged(INode Node)
-                {
-                    switch (Node.Status)
-                    {
-                        case NodeStatus.Connected:
-                            Tcs.TrySetResult();
-                            break;
-
-                        case NodeStatus.Disconnected:
-                            Tcs.TrySetCanceled();
-                            break;
-                    }
-                }
-
-                lock (this) StatusChanged += OnStatusChanged;
-                using (Token.Register(() => Tcs.TrySetCanceled()))
-                {
-                    try { await Tcs.Task; }
-                    catch { }
-                    finally { lock (this) StatusChanged -= OnStatusChanged; }
-                    return Tcs.Task.IsCompletedSuccessfully;
-                }
-            }
-
-            return true;
         }
 
         /// <inheritdoc/>
@@ -230,5 +202,6 @@ namespace Glazer.Core.Nodes.Internals.Remotes
 
             m_Services.Dispose();
         }
+
     }
 }
