@@ -1,6 +1,6 @@
 .vs
-*/*/bin
-*/*/obj
-*/*/*/bin
-*/*/*/obj
+src/*/bin
+src/*/obj
+src/*/*/bin
+src/*/*/obj
 nuget.config

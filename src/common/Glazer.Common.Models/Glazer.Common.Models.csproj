@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Backrole.Crypto" Version="1.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Extensions\Glazer.Kvdb.Extensions.csproj" />
+    <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Memory\Glazer.Kvdb.Memory.csproj" />
+    <ProjectReference Include="..\Glazer.Common\Glazer.Common.csproj" />
+  </ItemGroup>
+
+</Project>

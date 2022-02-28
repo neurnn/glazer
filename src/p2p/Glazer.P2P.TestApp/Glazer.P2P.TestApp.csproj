@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Glazer.P2P.Protocols\Glazer.P2P.Protocols.csproj" />
+    <ProjectReference Include="..\Glazer.P2P.Tcp\Glazer.P2P.Tcp.csproj" />
+  </ItemGroup>
+
+</Project>

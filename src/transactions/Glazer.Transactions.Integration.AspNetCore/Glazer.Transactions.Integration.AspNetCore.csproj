@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\Glazer.Common.Models\Glazer.Common.Models.csproj" />
+    <ProjectReference Include="..\..\common\Glazer.Common\Glazer.Common.csproj" />
+    <ProjectReference Include="..\Glazer.Transactions.Abstractions\Glazer.Transactions.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

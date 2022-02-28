@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Glazer.P2P.Abstractions\Glazer.P2P.Abstractions.csproj" />
+    <ProjectReference Include="..\Glazer.P2P.Tcp\Glazer.P2P.Tcp.csproj" />
+  </ItemGroup>
+
+</Project>

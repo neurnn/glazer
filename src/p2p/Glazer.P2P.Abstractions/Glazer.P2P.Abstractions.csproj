@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Backrole.Crypto" Version="1.0.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\Glazer.Common.Models\Glazer.Common.Models.csproj" />
+    <ProjectReference Include="..\..\common\Glazer.Common\Glazer.Common.csproj" />
+  </ItemGroup>
+
+</Project>

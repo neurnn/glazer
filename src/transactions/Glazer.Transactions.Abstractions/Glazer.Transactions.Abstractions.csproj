@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\blocks\Glazer.Storage.Abstraction\Glazer.Storage.Abstraction.csproj" />
+    <ProjectReference Include="..\..\common\Glazer.Common.Models\Glazer.Common.Models.csproj" />
+    <ProjectReference Include="..\..\common\Glazer.Common\Glazer.Common.csproj" />
+    <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Abstractions\Glazer.Kvdb.Abstractions.csproj" />
+    <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Memory\Glazer.Kvdb.Memory.csproj" />
+  </ItemGroup>
+
+</Project>

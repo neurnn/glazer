@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.MySQL\Glazer.Kvdb.MySQL.csproj" />
+    <ProjectReference Include="..\Glazer.Storage.Abstraction\Glazer.Storage.Abstraction.csproj" />
+  </ItemGroup>
+
+</Project>
