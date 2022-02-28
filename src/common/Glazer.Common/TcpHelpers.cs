@@ -107,7 +107,7 @@ namespace Glazer
                     }
                 }
 
-                return Buffer.Count > 0;
+                return Buffer.Count <= 0;
             });
         }
 
