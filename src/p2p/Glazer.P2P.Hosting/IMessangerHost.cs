@@ -1,10 +1,16 @@
-﻿using System.Threading;
+﻿using Glazer.P2P.Abstractions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Glazer.P2P.Hosting
 {
     public interface IMessangerHost
     {
+        /// <summary>
+        /// Messanger Instance.
+        /// </summary>
+        public IMessanger Messanger { get; }
+
         /// <summary>
         /// Start the P2P host asynchronously.
         /// </summary>

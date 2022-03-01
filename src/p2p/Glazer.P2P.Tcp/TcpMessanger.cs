@@ -54,16 +54,16 @@ namespace Glazer.P2P.Tcp
         /// <param name="Address"></param>
         /// <param name="KeyPair"></param>
         /// <returns></returns>
-        public static TcpMessanger RandomPort(IPAddress Address, SignKeyPair KeyPair = default)
+        public static TcpMessanger RandomPort(IPAddress Address, SignKeyPair KeyPair = default, ushort InitialPort = 7000)
         {
             while(true)
             {
-                var Port = BitConverter.ToUInt16(Rng.Make(2, true));
-                try { return new TcpMessanger(new IPEndPoint(Address, Port), KeyPair); }
+                try { return new TcpMessanger(new IPEndPoint(Address, InitialPort), KeyPair); }
                 catch
                 {
-
                 }
+
+                InitialPort = BitConverter.ToUInt16(Rng.Make(2, true));
             }
         }
 
@@ -179,7 +179,7 @@ namespace Glazer.P2P.Tcp
         {
             while (true)
             {
-                var Message = await m_Channel.Reader.ReadAsync(Token).AsTask();
+                var Message = await m_Channel.Reader.ReadAsync(Token);
                 if (Message is not null)
                 {
                     if (m_MessageBox.Check(Message) || Handle(Message))
@@ -188,7 +188,12 @@ namespace Glazer.P2P.Tcp
                     if (Message.Sender.PublicKey != KeyPair.PublicKey)
                         Emit(Message);
 
-                    m_MessageBox.Push(Message);
+                    else
+                    {
+                        m_MessageBox.Push(Message);
+                        continue;
+                    }
+
                     return Message;
                 }
 

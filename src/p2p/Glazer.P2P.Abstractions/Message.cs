@@ -61,12 +61,18 @@ namespace Glazer.P2P.Abstractions
         public byte[] Data { get; set; }
 
         /// <summary>
+        /// Nonce.
+        /// </summary>
+        private int m_Nounce = BitConverter.ToInt32(Rng.Make(sizeof(int)));
+
+        /// <summary>
         /// Encode the message to <see cref="BinaryWriter"/>.
         /// </summary>
         /// <param name="Writer"></param>
         public void Encode(BinaryWriter Writer)
         {
             Writer.Write(Expiration);
+            Writer.Write7BitEncodedInt(m_Nounce);
 
             Writer.Write(Sender);
             Writer.Write(Receiver);
@@ -102,6 +108,8 @@ namespace Glazer.P2P.Abstractions
         {
             if ((Expiration = Reader.ReadTimeStamp()) > TimeStamp.Now || Enforce)
             {
+                m_Nounce = Reader.Read7BitEncodedInt();
+
                 Sender = Reader.ReadSignSealValue();
                 Receiver = Reader.ReadSignPublicKey();
 

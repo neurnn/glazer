@@ -27,6 +27,9 @@ namespace Glazer.P2P.Hosting.Impls
         }
 
         /// <inheritdoc/>
+        public IMessanger Messanger => m_Messanger;
+
+        /// <inheritdoc/>
         public Task StartAsync(CancellationToken Token = default)
         {
             m_Cts = new CancellationTokenSource();

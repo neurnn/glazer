@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Glazer.Common.Models
 {
@@ -7,6 +8,8 @@ namespace Glazer.Common.Models
     /// </summary>
     public struct Actor : IEquatable<Actor>
     {
+        private static readonly string CHARS = "abcdefghijklmnopqrstuvwxyz0123456789_-.";
+
         /// <summary>
         /// Initialize a new <see cref="Actor"/> instance.
         /// </summary>
@@ -16,6 +19,19 @@ namespace Glazer.Common.Models
         /* Comparison operators. */
         public static bool operator ==(Actor L, Actor R) => L.Equals(R);
         public static bool operator !=(Actor L, Actor R) => !L.Equals(R);
+
+        /// <summary>
+        /// Test whether the login name can be used or not.
+        /// </summary>
+        /// <param name="Login"></param>
+        /// <returns></returns>
+        public static bool CanUse(string Login)
+        {
+            if (string.IsNullOrWhiteSpace(Login) || Login.Length > 16 || Login.Length < 4)
+                return false;
+
+            return Login.Count(X => CHARS.Contains(X)) == Login.Length;
+        }
 
         /// <summary>
         /// Actor to String.

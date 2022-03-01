@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\blocks\Glazer.Storage.Integration.AspNetCore\Glazer.Storage.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\blocks\Glazer.Storage.Sqlite\Glazer.Storage.Sqlite.csproj" />
+    <ProjectReference Include="..\..\common\Glazer.Common.Models\Glazer.Common.Models.csproj" />
+    <ProjectReference Include="..\..\common\Glazer.Common\Glazer.Common.csproj" />
+    <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Integration.AspNetCore\Glazer.Kvdb.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Sqlite\Glazer.Kvdb.Sqlite.csproj" />
+    <ProjectReference Include="..\..\p2p\Glazer.P2P.Integration.AspNetCore\Glazer.P2P.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\transactions\Glazer.Transactions.Integration.AspNetCore\Glazer.Transactions.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\transactions\Glazer.Transactions.Sqlite\Glazer.Transactions.Sqlite.csproj" />
+    <ProjectReference Include="..\Glazer.Nodes.Abstractions\Glazer.Nodes.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

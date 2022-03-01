@@ -93,19 +93,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.P2P.Abstractions", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Implementations", "1. Implementations", "{318DF7C2-C204-4792-A6BA-8B888901C7F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.P2P.Tcp", "src\p2p\Glazer.P2P.Tcp\Glazer.P2P.Tcp.csproj", "{C991F7F4-14AE-45A5-81D6-F19A8E621570}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.P2P.Tcp", "src\p2p\Glazer.P2P.Tcp\Glazer.P2P.Tcp.csproj", "{C991F7F4-14AE-45A5-81D6-F19A8E621570}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.P2P.Protocols", "src\p2p\Glazer.P2P.Protocols\Glazer.P2P.Protocols.csproj", "{B525A783-BB0C-4214-9083-277A6C5E81CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.P2P.Protocols", "src\p2p\Glazer.P2P.Protocols\Glazer.P2P.Protocols.csproj", "{B525A783-BB0C-4214-9083-277A6C5E81CE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Test App", "2. Test App", "{FAB0F1D7-1244-4517-8C78-FFB237427BC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.P2P.TestApp", "src\p2p\Glazer.P2P.TestApp\Glazer.P2P.TestApp.csproj", "{3A21A7D8-7BC6-40CE-9BC4-0AE89105ACB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.P2P.TestApp", "src\p2p\Glazer.P2P.TestApp\Glazer.P2P.TestApp.csproj", "{3A21A7D8-7BC6-40CE-9BC4-0AE89105ACB3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Integration", "3. Integration", "{7CEB42D9-76EB-454F-B74A-1EEFC1FAFDAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.P2P.Integration.AspNetCore", "src\p2p\Glazer.P2P.Integration.AspNetCore\Glazer.P2P.Integration.AspNetCore.csproj", "{FB5B8B81-FBEE-44E6-BDAF-107BA45280B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.P2P.Integration.AspNetCore", "src\p2p\Glazer.P2P.Integration.AspNetCore\Glazer.P2P.Integration.AspNetCore.csproj", "{FB5B8B81-FBEE-44E6-BDAF-107BA45280B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.P2P.Hosting", "src\p2p\Glazer.P2P.Hosting\Glazer.P2P.Hosting.csproj", "{62E77BD1-B4D5-488D-9E2B-B27A4FA6450F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glazer.P2P.Hosting", "src\p2p\Glazer.P2P.Hosting\Glazer.P2P.Hosting.csproj", "{62E77BD1-B4D5-488D-9E2B-B27A4FA6450F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.Nodes.Common", "src\nodes\Glazer.Nodes.Common\Glazer.Nodes.Common.csproj", "{828CAC44-E5AB-4740-ACA8-F1B7536E5222}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Application", "0. Application", "{2E1731D7-F5C0-404F-B65D-C5EB160B85BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.Nodes", "src\nodes\Glazer.Nodes\Glazer.Nodes.csproj", "{BCD9DB79-F781-4162-86BE-8ED8D3C2D798}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glazer.Nodes.Repeater", "src\nodes\Glazer.Nodes.Repeater\Glazer.Nodes.Repeater.csproj", "{0E8744EE-D6D0-47B1-A77B-69D70F0C759C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -233,6 +241,18 @@ Global
 		{62E77BD1-B4D5-488D-9E2B-B27A4FA6450F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62E77BD1-B4D5-488D-9E2B-B27A4FA6450F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62E77BD1-B4D5-488D-9E2B-B27A4FA6450F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{828CAC44-E5AB-4740-ACA8-F1B7536E5222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{828CAC44-E5AB-4740-ACA8-F1B7536E5222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{828CAC44-E5AB-4740-ACA8-F1B7536E5222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{828CAC44-E5AB-4740-ACA8-F1B7536E5222}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCD9DB79-F781-4162-86BE-8ED8D3C2D798}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCD9DB79-F781-4162-86BE-8ED8D3C2D798}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCD9DB79-F781-4162-86BE-8ED8D3C2D798}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCD9DB79-F781-4162-86BE-8ED8D3C2D798}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E8744EE-D6D0-47B1-A77B-69D70F0C759C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E8744EE-D6D0-47B1-A77B-69D70F0C759C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E8744EE-D6D0-47B1-A77B-69D70F0C759C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E8744EE-D6D0-47B1-A77B-69D70F0C759C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -286,6 +306,10 @@ Global
 		{7CEB42D9-76EB-454F-B74A-1EEFC1FAFDAF} = {C5847A47-B158-4A6D-B28E-0009475616AD}
 		{FB5B8B81-FBEE-44E6-BDAF-107BA45280B3} = {7CEB42D9-76EB-454F-B74A-1EEFC1FAFDAF}
 		{62E77BD1-B4D5-488D-9E2B-B27A4FA6450F} = {C5847A47-B158-4A6D-B28E-0009475616AD}
+		{828CAC44-E5AB-4740-ACA8-F1B7536E5222} = {4AD81DE3-4972-4D6A-9CFC-830D6A4516BF}
+		{2E1731D7-F5C0-404F-B65D-C5EB160B85BB} = {134EB35E-C6A0-47D7-8AB6-6565B7B98372}
+		{BCD9DB79-F781-4162-86BE-8ED8D3C2D798} = {2E1731D7-F5C0-404F-B65D-C5EB160B85BB}
+		{0E8744EE-D6D0-47B1-A77B-69D70F0C759C} = {2E1731D7-F5C0-404F-B65D-C5EB160B85BB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E59F7C1-3D55-484C-AAC7-01C351CAB647}
