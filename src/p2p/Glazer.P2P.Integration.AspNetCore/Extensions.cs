@@ -19,8 +19,6 @@ namespace Glazer.P2P.Integration.AspNetCore
         public static IMessangerHostBuilder AddP2PHostService(this IServiceCollection Services)
         {
             var HostBuilder = new MessangerHostBuilder();
-            var SD = Services.FirstOrDefault(X => X.ServiceType == typeof(IMessangerHost));
-            if (SD != null) Services.Remove(SD);
 
             Services
                 .AddSingleton(_ => HostBuilder.Build())

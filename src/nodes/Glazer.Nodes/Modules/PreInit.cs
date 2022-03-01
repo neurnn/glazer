@@ -1,7 +1,6 @@
 ﻿using Backrole.Crypto;
-using Glazer.Kvdb.Integration.AspNetCore;
 using Glazer.Nodes.Abstractions;
-using Glazer.P2P.Hosting;
+using Glazer.P2P.Abstractions;
 using Glazer.P2P.Tcp;
 using Glazer.Storage.Abstraction;
 using Glazer.Storage.Integration.AspNetCore;
@@ -85,10 +84,10 @@ namespace Glazer.Nodes.Modules
         public override void ConfigureServices(IServiceCollection Services, NodeOptions Options)
         {
             if (!Directory.Exists(Options.BlockDir))
-                 Directory.CreateDirectory(Options.BlockDir);
-            
+                Directory.CreateDirectory(Options.BlockDir);
+
             if (!Directory.Exists(Options.StateDir))
-                 Directory.CreateDirectory(Options.StateDir);
+                Directory.CreateDirectory(Options.StateDir);
 
             Services
                 .AddSingleton(Options);
@@ -100,6 +99,38 @@ namespace Glazer.Nodes.Modules
                     var Blocks = App.GetRequiredService<IStorage>();
                     return new SqliteTransactionSets(Blocks, Options.StateDir);
                 });
+
+            ConfigureP2PMessnager(Services, Options);
+        }
+
+        /// <summary>
+        /// Configure the <see cref="IMessanger"/> instance.
+        /// </summary>
+        /// <param name="Services"></param>
+        /// <param name="Options"></param>
+        private void ConfigureP2PMessnager(IServiceCollection Services, NodeOptions Options)
+        {
+            var Endpoint = IPEndPoint.Parse(Options.P2PEndpoint);
+            var Seeds = Options.P2PSeeds.Select(X => IPEndPoint.Parse(X)).ToArray();
+            Services
+                .AddSingleton<IMessanger>(Services =>
+                {
+                    if (Debugger.IsAttached)
+                    {
+                        var Port = (ushort)Math.Min(Endpoint.Port, ushort.MaxValue - 1);
+                        var Instance = TcpMessanger.RandomPort(Endpoint.Address, default, Port);
+
+                        if (Endpoint.Port != Port)
+                            Instance.Contact(new IPEndPoint(IPAddress.Loopback, Endpoint.Port));
+
+                        foreach (var Each in Seeds)
+                            Instance.Contact(Each);
+
+                        return Instance;
+                    }
+
+                    return new TcpMessanger(Endpoint);
+                });
         }
 
         /// <inheritdoc/>
@@ -108,35 +139,6 @@ namespace Glazer.Nodes.Modules
             Mvc
                 .AddBlockStorageApiControllers()
                 .AddTransactionSetApiController();
-        }
-
-        /// <inheritdoc/>
-        public override void ConfigureP2PHostService(IMessangerHostBuilder P2P, NodeOptions Options)
-        {
-            P2P
-                .With(Options.P2PSeeds.Select(X => IPEndPoint.Parse(X)).ToArray())
-                .SetEndpoint(IPEndPoint.Parse(Options.P2PEndpoint)).Set(default)
-                .SetFactory((Endpoint, KeyPair) =>
-                {
-                    if (Debugger.IsAttached)
-                    {
-                        var Port = (ushort)Math.Min(Endpoint.Port, ushort.MaxValue - 1);
-                        var Instance = TcpMessanger.RandomPort(Endpoint.Address, KeyPair, Port);
-
-                        P2P.With(new IPEndPoint(IPAddress.Loopback, Endpoint.Port)); // --> Adds the endpoint as initial peer.
-                        return Instance;
-                    }
-
-                    return new TcpMessanger(Endpoint, KeyPair);
-                })
-                .WhenEnter(Who =>
-                {
-                    Console.WriteLine($"Enter: {Who}");
-                })
-                .WhenLeave(Who =>
-                {
-                    Console.WriteLine($"Leave: {Who}");
-                });
         }
 
         /// <inheritdoc/>

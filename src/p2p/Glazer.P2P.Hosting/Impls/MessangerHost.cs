@@ -55,7 +55,6 @@ namespace Glazer.P2P.Hosting.Impls
         /// <returns></returns>
         private async Task RunAsync(CancellationToken Token)
         {
-
             try
             {
                 while (!Token.IsCancellationRequested)

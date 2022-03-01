@@ -1,5 +1,6 @@
 ﻿using Glazer.Kvdb.Integration.AspNetCore;
 using Glazer.Nodes.Abstractions;
+using Glazer.P2P.Abstractions;
 using Glazer.P2P.Integration.AspNetCore;
 using Glazer.Transactions.Integration.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -47,14 +48,17 @@ namespace Glazer.Nodes
                             foreach (var Each in Options.ModuleInstances)
                                 Each.ConfigureMvcBuilder(Mvc, Options);
 
-                            foreach (var Each in Options.ModuleInstances)
-                                Each.ConfigureP2PHostService(P2P, Options);
 
                         })
                         .Configure((Web, App) =>
                         {
                             foreach (var Each in Options.ModuleInstances)
                                 Each.ConfigureApplicationBuilder(App, Options);
+
+                            var Services = App.ApplicationServices;
+                            var P2P = Services.GetRequiredService<IMessanger>();
+                            foreach (var Each in Options.ModuleInstances)
+                                Each.ConfigureP2PMessanger(Services, P2P, Options);
                         });
                     
                 })
