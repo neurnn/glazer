@@ -1,15 +1,10 @@
-﻿using Backrole.Crypto;
-using Glazer.Common;
+﻿using Glazer.Common;
 using Glazer.Common.Models;
 using Glazer.Kvdb.Abstractions;
 using Glazer.Kvdb.Extensions;
 using Glazer.Kvdb.MySQL;
 using Glazer.Storage.Abstraction;
-using Glazer.Storage.Abstraction.Internals;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,14 +16,10 @@ namespace Glazer.Storage.MySQL
 
         private IKvTable m_Blocks;
         private IKvTable m_Properties;
-        private IKvTable m_Surfaces;
         private IKvTable m_Forwards;
-        private IKvTable m_Indices;
 
         private BlockId? m_InitialBlockId;
         private BlockId? m_LatestBlockId;
-
-        private SurfaceTransactionIndices m_SurfaceIndices;
 
         /// <summary>
         /// Initialize a new <see cref="MySqlStorage"/> instance.
@@ -38,13 +29,8 @@ namespace Glazer.Storage.MySQL
             m_Scheme = Scheme;
 
             m_Blocks = Scheme.Open("blocks") ?? Scheme.Create("blocks");
+            m_Forwards = m_Scheme.Open("forwards") ?? m_Scheme.Create("forwards");
             m_Properties = Scheme.Open("properties") ?? Scheme.Create("properties");
-            m_Surfaces = Scheme.Open("surfaces") ?? Scheme.Create("surfaces");
-            m_Forwards = Scheme.Open("forwards") ?? Scheme.Create("forwards");
-            m_Indices = Scheme.Open("indices") ?? Scheme.Create("indices");
-
-            SurfaceSet = new SurfaceKvTable(this, m_Surfaces);
-            m_SurfaceIndices = new SurfaceTransactionIndices(this, m_Indices);
         }
 
         /// <inheritdoc/>
@@ -75,43 +61,6 @@ namespace Glazer.Storage.MySQL
                     return m_InitialBlockId.Value;
                 }
             }
-        }
-
-        /// <inheritdoc/>
-        public IKvTable SurfaceSet { get; }
-
-        /// <inheritdoc/>
-        public async IAsyncEnumerable<BlockId> ListAsync(BlockId Origin, bool Direction = false, [EnumeratorCancellation] CancellationToken Token = default)
-        {
-            if (!Origin.IsValid)
-                Origin = LatestBlockId;
-
-            while (!Token.IsCancellationRequested && Origin.IsValid)
-            {
-                if (Direction)
-                {
-                    var Next = await m_Forwards.GetGuidAsync(Origin.ToString());
-                    if (Next == Guid.Empty)
-                        break;
-
-                    yield return Origin = new BlockId(Next);
-                }
-
-                else
-                {
-                    var Block = await GetAsync(Origin);
-                    if (!Block.Previous.IsValid)
-                        break;
-
-                    yield return Origin = Block.Previous.Id;
-                }
-            }
-        }
-
-        /// <inheritdoc/>
-        public Task<BlockId> GetTransactionAsync(HashValue TransactionId, CancellationToken Token = default)
-        {
-            return m_SurfaceIndices.GetTransactionAsync(TransactionId, Token);
         }
 
         /// <inheritdoc/>
@@ -152,6 +101,9 @@ namespace Glazer.Storage.MySQL
 
             lock (this)
             {
+                if (InitialBlockId.Guid == Guid.Empty)
+                    m_Properties.SetGuid("initial_block_id", (m_LatestBlockId = BlockId).Value.Guid);
+
                 if (Block.Previous.Id == LatestBlockId)
                     m_Properties.SetGuid("latest_block_id", (m_LatestBlockId = BlockId).Value.Guid);
             }
@@ -178,7 +130,6 @@ namespace Glazer.Storage.MySQL
             m_Blocks.Dispose();
             m_Forwards.Dispose();
             m_Properties.Dispose();
-            m_Surfaces.Dispose();
 
             m_Scheme.Dispose();
         }

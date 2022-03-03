@@ -26,7 +26,7 @@ namespace Glazer.Kvdb.Sqlite
         public SqliteKvScheme(string Path)
         {
             if (!File.Exists(Path))
-                throw new FileNotFoundException("No SQLite database file exists.");
+                SQLiteConnection.CreateFile(Path);
 
             var Sqlite = new SQLiteConnection($"Data Source={Path}");
             m_Connection = new SqliteKvConnection(Sqlite.OpenAndReturn());

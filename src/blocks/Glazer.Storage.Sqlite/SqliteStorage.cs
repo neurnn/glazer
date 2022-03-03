@@ -1,12 +1,9 @@
-﻿using Backrole.Crypto;
-using Glazer.Common;
-using Glazer.Common.Common;
+﻿using Glazer.Common;
 using Glazer.Common.Models;
 using Glazer.Kvdb.Abstractions;
 using Glazer.Kvdb.Extensions;
 using Glazer.Kvdb.Sqlite;
 using Glazer.Storage.Abstraction;
-using Glazer.Storage.Abstraction.Internals;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,18 +19,13 @@ namespace Glazer.Storage.Sqlite
     public class SqliteStorage : IStorage
     {
         private IKvScheme m_Scheme;
-        private IKvScheme m_CacheScheme;
 
         private IKvTable m_Blocks;
         private IKvTable m_Properties;
-        private IKvTable m_Surfaces;
         private IKvTable m_Forwards;
-        private IKvTable m_Indices;
         
         private BlockId? m_InitialBlockId;
         private BlockId? m_LatestBlockId;
-
-        private SurfaceTransactionIndices m_SurfaceIndices;
 
         /// <summary>
         /// Initialize a new <see cref="SqliteStorage"/> instance.
@@ -63,13 +55,6 @@ namespace Glazer.Storage.Sqlite
             m_Blocks = m_Scheme.Open("blocks") ?? m_Scheme.Create("blocks");
             m_Forwards = m_Scheme.Open("forwards") ?? m_Scheme.Create("forwards");
             m_Properties = m_Scheme.Open("properties") ?? m_Scheme.Create("properties");
-
-            m_CacheScheme = new SqliteKvScheme(CacheFile);
-            m_Surfaces = m_CacheScheme.Open("surfaces") ?? m_CacheScheme.Create("surfaces");
-            m_Indices = m_CacheScheme.Open("indices") ?? m_CacheScheme.Create("indices");
-
-            SurfaceSet = new SurfaceKvTable(this, m_Surfaces);
-            m_SurfaceIndices = new SurfaceTransactionIndices(this, m_Indices);
         }
 
         /// <inheritdoc/>
@@ -79,7 +64,7 @@ namespace Glazer.Storage.Sqlite
             {
                 lock (this)
                 {
-                    if (m_InitialBlockId.HasValue)
+                    if (!m_InitialBlockId.HasValue)
                         m_InitialBlockId = new BlockId(m_Properties.GetGuid("initial_block_id"));
 
                     return m_InitialBlockId.Value;
@@ -94,7 +79,7 @@ namespace Glazer.Storage.Sqlite
             {
                 lock (this)
                 {
-                    if (m_LatestBlockId.HasValue)
+                    if (!m_LatestBlockId.HasValue)
                         m_LatestBlockId = new BlockId(m_Properties.GetGuid("latest_block_id"));
 
                     return m_InitialBlockId.Value;
@@ -134,12 +119,6 @@ namespace Glazer.Storage.Sqlite
         }
 
         /// <inheritdoc/>
-        public Task<BlockId> GetTransactionAsync(HashValue TransactionId, CancellationToken Token = default)
-        {
-            return m_SurfaceIndices.GetTransactionAsync(TransactionId, Token);
-        }
-
-        /// <inheritdoc/>
         public async Task<Block> GetAsync(BlockId BlockId, CancellationToken Token = default)
         {
             var Key = BlockId.ToString();
@@ -167,13 +146,16 @@ namespace Glazer.Storage.Sqlite
             if (!Block.TryExport(Writer, Block))
                 throw new InvalidOperationException("the block is not valid.");
 
-            if (!await m_Blocks.SetAsync(Key, null) ||
+            if (!await m_Blocks.SetAsync(Key, Writer.ToByteArray()) ||
                 !await m_Forwards.SetGuidAsync(Key, NextId) ||
                 !await m_Forwards.SetGuidAsync(Block.Previous.ToString(), BlockId.Guid))
                 throw new InvalidOperationException("the block couldn't be stored.");
 
             lock (this)
             {
+                if (InitialBlockId.Guid == Guid.Empty)
+                    m_Properties.SetGuid("initial_block_id", (m_InitialBlockId = BlockId).Value.Guid);
+
                 if (NextId == Guid.Empty) // Block.Previous.Id == LatestBlockId
                     m_Properties.SetGuid("latest_block_id", (m_LatestBlockId = BlockId).Value.Guid);
             }
@@ -200,10 +182,8 @@ namespace Glazer.Storage.Sqlite
             m_Blocks.Dispose();
             m_Forwards.Dispose();
             m_Properties.Dispose();
-            m_Surfaces.Dispose();
 
             m_Scheme.Dispose();
-            m_CacheScheme.Dispose();
         }
     }
 }

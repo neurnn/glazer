@@ -179,7 +179,7 @@ namespace Glazer.Common.Models
         /// <summary>
         /// Determines whether the transaction is valid or not.
         /// </summary>
-        public bool IsValid => Previous.IsValid && Transactions != null && Witness != null && Producer.IsValid;
+        public bool IsValid => Transactions != null && Witness != null && Producer.IsValid;
 
         /// <summary>
         /// Test whether the block contains the given transaction or not.

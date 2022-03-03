@@ -59,27 +59,5 @@ namespace Glazer.Storage.Integration.AspNetCore.Controllers
 
             return Content(Json.ToString(Formatting.Indented), "application/json", Encoding.UTF8);
         }
-
-        /// <summary>
-        /// Get the surface value of the blockchain asynchronously.
-        /// Usage: /api/v1/block/get_value?key=...
-        /// </summary>
-        /// <param name="Key"></param>
-        /// <returns></returns>
-        [Route("get_value")][HttpGet]
-        public async Task<IActionResult> GetValueAsync([FromQuery(Name = "key")] string Key)
-        {
-            if (string.IsNullOrWhiteSpace(Key))
-                return StatusCode(400);
-
-            var Storage = HttpContext.RequestServices.GetBlockStorage();
-            var Value = await Storage.SurfaceSet.GetAsync(Key, HttpContext.RequestAborted);
-
-            if (Value is null)
-                return StatusCode(204);
-
-            var Json = BsonConvert.Deserialize<JObject>(Value);
-            return Content(Json.ToString(Formatting.Indented), "application/json", Encoding.UTF8);
-        }
     }
 }
