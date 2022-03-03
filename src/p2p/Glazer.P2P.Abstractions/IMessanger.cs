@@ -17,6 +17,11 @@ namespace Glazer.P2P.Abstractions
         IMessanger Use<TProtocol>() where TProtocol : IMessangerProtocol, new();
 
         /// <summary>
+        /// Service Provider. this is only valid if the integration activated.
+        /// </summary>
+        IServiceProvider Services { get; }
+
+        /// <summary>
         /// Key Pair to sign the message.
         /// </summary>
         SignKeyPair KeyPair { get; }

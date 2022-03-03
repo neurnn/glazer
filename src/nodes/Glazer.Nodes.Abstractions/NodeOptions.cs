@@ -35,6 +35,17 @@ namespace Glazer.Nodes.Abstractions
         public string PrivateKey { get; set; }
 
         /// <summary>
+        /// Get the key pair.
+        /// </summary>
+        /// <returns></returns>
+        public SignKeyPair GetKeyPair()
+        {
+            var PubKey = SignPublicKey.Parse(PublicKey);
+            var PvtKey = SignPrivateKey.Parse(PrivateKey);
+            return new SignKeyPair(PvtKey, PubKey);
+        }
+
+        /// <summary>
         /// HTTP Endpoint of the node.
         /// </summary>
         [JsonProperty("http_endpoint")]
@@ -55,7 +66,7 @@ namespace Glazer.Nodes.Abstractions
         /// <summary>
         /// Genesis Setting file.
         /// </summary>
-        [JsonProperty("genesis_json")]
+        [JsonIgnore]
         public string GenesisFile { get; set; }
 
         /// <summary>

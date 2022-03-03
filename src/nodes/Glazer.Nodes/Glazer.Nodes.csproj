@@ -14,10 +14,13 @@
     <ProjectReference Include="..\..\common\Glazer.Common\Glazer.Common.csproj" />
     <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Integration.AspNetCore\Glazer.Kvdb.Integration.AspNetCore.csproj" />
     <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Sqlite\Glazer.Kvdb.Sqlite.csproj" />
-    <ProjectReference Include="..\..\p2p\Glazer.P2P.Integration.AspNetCore\Glazer.P2P.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\p2p\Glazer.P2P.Tcp\Glazer.P2P.Tcp.csproj" />
     <ProjectReference Include="..\..\transactions\Glazer.Transactions.Integration.AspNetCore\Glazer.Transactions.Integration.AspNetCore.csproj" />
     <ProjectReference Include="..\..\transactions\Glazer.Transactions.Sqlite\Glazer.Transactions.Sqlite.csproj" />
     <ProjectReference Include="..\Glazer.Nodes.Abstractions\Glazer.Nodes.Abstractions.csproj" />
+    <ProjectReference Include="..\Glazer.Nodes.Common\Glazer.Nodes.Common.csproj" />
+    <ProjectReference Include="..\Glazer.Nodes.Genesis\Glazer.Nodes.Genesis.csproj" />
+    <ProjectReference Include="..\Glazer.Nodes.Multi\Glazer.Nodes.Multi.csproj" />
   </ItemGroup>
 
 </Project>

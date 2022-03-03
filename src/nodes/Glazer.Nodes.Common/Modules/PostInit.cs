@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Glazer.Nodes.Modules
+namespace Glazer.Nodes.Common.Modules
 {
     public sealed class PostInit : NodeModule<PostInit>
     {

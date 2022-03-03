@@ -23,8 +23,6 @@ namespace Glazer.Transactions.Sqlite
         private SqliteTransactionQueue m_PendingSet;
         private SqliteTransactionQueue m_WorkingSet;
 
-        private Task m_Verification;
-
         /// <summary>
         /// Initialize a new <see cref="SqliteTransactionSets"/> instance.
         /// </summary>
@@ -47,7 +45,6 @@ namespace Glazer.Transactions.Sqlite
         {
             get
             {
-                Initialize().GetAwaiter().GetResult();
                 return ModelHelpers.Locked(this, () => m_PendingSet);
             }
         }
@@ -57,7 +54,6 @@ namespace Glazer.Transactions.Sqlite
         {
             get
             {
-                Initialize().GetAwaiter().GetResult();
                 lock (this)
                 {
                     if (m_WorkingSet.Completed && m_PendingSet.Pendings > 0)
@@ -85,72 +81,9 @@ namespace Glazer.Transactions.Sqlite
             }
         }
 
-        /// <summary>
-        /// Verify the <see cref="SqliteTransactionSets"/> status.
-        /// </summary>
-        /// <returns></returns>
-        private async Task VerifyAsync()
-        {
-            var Pendings = new List<TransactionRegistration>();
-            m_PendingSet.GetPendings(Pendings);
-
-            foreach (var Each in Pendings)
-            {
-                var Status = m_WorkingSet.GetStatus(Each.Id);
-                if (Status.Status != TransactionStatus.NotFound)
-                {
-                    m_PendingSet.SetStatus(Each.Id, Status);
-                    continue;
-                }
-
-                var BlockId = await m_Storage.GetTransactionAsync(Each.Id);
-                if (BlockId.IsValid)
-                {
-                    m_PendingSet.SetStatus(Each.Id,
-                        new TransactionExecutionStatus(TransactionStatus.Completed, string.Empty));
-                }
-            }
-
-            if (m_PendingSet.Pendings <= 0)
-                m_PendingSet.Clear();
-
-            Pendings.Clear();
-            m_WorkingSet.GetPendings(Pendings);
-
-            foreach (var Each in Pendings)
-            {
-                var BlockId = await m_Storage.GetTransactionAsync(Each.Id);
-                if (BlockId.IsValid)
-                {
-                    m_WorkingSet.SetStatus(Each.Id,
-                        new TransactionExecutionStatus(TransactionStatus.Completed, string.Empty));
-                }
-            }
-
-            if (m_WorkingSet.Pendings <= 0)
-                m_WorkingSet.Clear();
-        }
-
-        /// <summary>
-        /// Initialize the <see cref="SqliteTransactionSets"/> once.
-        /// </summary>
-        /// <returns></returns>
-        private Task Initialize()
-        {
-            lock(this)
-            {
-                if (m_Verification is null)
-                    m_Verification = VerifyAsync();
-
-                return m_Verification;
-            }
-        }
-
         /// <inheritdoc/>
         public TransactionExecutionStatus PeekExecutionStatus(HashValue Id)
         {
-            Initialize().GetAwaiter().GetResult();
-
             lock (this)
             {
                 TransactionExecutionStatus Status;
@@ -162,20 +95,12 @@ namespace Glazer.Transactions.Sqlite
                     return Status;
             }
 
-            var BlockId = m_Storage.GetTransactionAsync(Id).GetAwaiter().GetResult();
-            if (BlockId.IsValid)
-            {
-                return new TransactionExecutionStatus(TransactionStatus.Completed, string.Empty);
-            }
-
             return new TransactionExecutionStatus(TransactionStatus.NotFound, string.Empty);
         }
 
         /// <inheritdoc/>
         public async Task<TransactionExecutionStatus> WaitExecutionStatusAsync(HashValue Id, CancellationToken Token = default)
         {
-            await Initialize();
-
             while (true)
             {
                 var Status = PeekExecutionStatus(Id);

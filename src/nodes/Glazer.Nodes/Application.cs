@@ -1,14 +1,15 @@
-﻿using Glazer.Kvdb.Integration.AspNetCore;
+﻿using Backrole.Crypto;
 using Glazer.Nodes.Abstractions;
+using Glazer.Nodes.Common.Modules;
 using Glazer.P2P.Abstractions;
-using Glazer.P2P.Integration.AspNetCore;
-using Glazer.Transactions.Integration.AspNetCore;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Glazer.Nodes
@@ -25,8 +26,29 @@ namespace Glazer.Nodes
             var Host = new HostBuilder()
                 .ConfigureWebHostDefaults(Http =>
                 {
+                    if (Debugger.IsAttached)
+                    {
+                        Args = Args.Concat(new string[] {
+                            "--config", "node.json",
+                            "--genesis", "genesis.json"
+                        }).ToArray();
+                    }
+
                     var Options = NodeOptions.Parse(Args,
-                        Preview => Preview.ModuleAssemblies.Add(typeof(Application).Assembly));
+                        Preview =>
+                        {
+                            Preview
+                                .ModuleAssemblies
+                                .Add(typeof(PreInit).Assembly);
+
+                            Preview
+                                .ModuleAssemblies
+                                .Add(typeof(Genesis).Assembly);
+
+                            Preview
+                                .ModuleAssemblies
+                                .Add(typeof(Multi).Assembly);
+                        });
 
                     foreach (var Each in Options.ModuleInstances)
                         Each.ConfigureWebHostBuilder(Http, Options);
@@ -40,15 +62,12 @@ namespace Glazer.Nodes
                         .ConfigureServices(Services =>
                         {
                             var Mvc = Services.AddControllers();
-                            var P2P = Services.AddP2PHostService();
 
                             foreach (var Each in Options.ModuleInstances)
                                 Each.ConfigureServices(Services, Options);
 
                             foreach (var Each in Options.ModuleInstances)
                                 Each.ConfigureMvcBuilder(Mvc, Options);
-
-
                         })
                         .Configure((Web, App) =>
                         {
@@ -57,8 +76,12 @@ namespace Glazer.Nodes
 
                             var Services = App.ApplicationServices;
                             var P2P = Services.GetRequiredService<IMessanger>();
-                            foreach (var Each in Options.ModuleInstances)
-                                Each.ConfigureP2PMessanger(Services, P2P, Options);
+
+                            lock (P2P)
+                            {
+                                foreach (var Each in Options.ModuleInstances)
+                                    Each.ConfigureP2PMessanger(Services, P2P, Options);
+                            }
                         });
                     
                 })

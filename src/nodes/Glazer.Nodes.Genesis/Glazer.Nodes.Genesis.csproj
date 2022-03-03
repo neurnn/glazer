@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Glazer.Nodes</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Glazer.Nodes.Abstractions\Glazer.Nodes.Abstractions.csproj" />
+    <ProjectReference Include="..\Glazer.Nodes.Common\Glazer.Nodes.Common.csproj" />
+  </ItemGroup>
+
+</Project>

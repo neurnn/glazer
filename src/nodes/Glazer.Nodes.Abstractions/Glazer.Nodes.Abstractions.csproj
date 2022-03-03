@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Abstractions\Glazer.Kvdb.Abstractions.csproj" />
     <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Extensions\Glazer.Kvdb.Extensions.csproj" />
     <ProjectReference Include="..\..\kvdb\Glazer.Kvdb.Memory\Glazer.Kvdb.Memory.csproj" />
-    <ProjectReference Include="..\..\p2p\Glazer.P2P.Hosting\Glazer.P2P.Hosting.csproj" />
+    <ProjectReference Include="..\..\p2p\Glazer.P2P.Abstractions\Glazer.P2P.Abstractions.csproj" />
     <ProjectReference Include="..\..\transactions\Glazer.Transactions.Abstractions\Glazer.Transactions.Abstractions.csproj" />
     <ProjectReference Include="..\..\transactions\Glazer.Transactions.Memory\Glazer.Transactions.Memory.csproj" />
   </ItemGroup>

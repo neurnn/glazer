@@ -17,14 +17,7 @@ namespace Glazer.Transactions.Memory
     /// </summary>
     public class MemoryTransactionSets : ITransactionSets
     {
-        private IReadOnlyStorage m_Storage;
         private MemoryTransactionQueue m_WorkingSet, m_PendingSet;
-
-        /// <summary>
-        /// Initialize a new <see cref="MemoryTransactionSets"/> instance.
-        /// </summary>
-        /// <param name="Storage"></param>
-        public MemoryTransactionSets(IReadOnlyStorage Storage) => m_Storage = Storage;
 
         /// <inheritdoc/>
         public ITransactionQueue PendingSet => Locked(this, () => OnDemand(ref m_PendingSet));
@@ -117,12 +110,6 @@ namespace Glazer.Transactions.Memory
 
                 if (m_WorkingSet != null && (Status = m_WorkingSet.GetStatus(Id)).Status != TransactionStatus.NotFound)
                     return Status;
-            }
-
-            var BlockId = m_Storage.GetTransactionAsync(Id).GetAwaiter().GetResult();
-            if (BlockId.IsValid)
-            {
-                return new TransactionExecutionStatus(TransactionStatus.Completed, string.Empty);
             }
 
             return new TransactionExecutionStatus(TransactionStatus.NotFound, string.Empty);

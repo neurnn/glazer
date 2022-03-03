@@ -15,16 +15,16 @@ namespace Glazer.Executions.Abstractions
     {
         private Dictionary<string, Func<ExecutionContext>> m_Factories = new();
         private ProtocolAccessor m_Protocols;
-        private IStorage m_Storage;
+        private IKvTable m_SurfaceView;
 
         /// <summary>
         /// Initialize a new <see cref="ExecutionContextFactory"/> instance.
         /// </summary>
-        /// <param name="Storage"></param>
-        public ExecutionContextFactory(IStorage Storage)
+        /// <param name="SurfaceView"></param>
+        public ExecutionContextFactory(IKvTable SurfaceView)
         {
-            m_Protocols = new ProtocolAccessor(Storage.SurfaceSet);
-            m_Storage = Storage;
+            m_Protocols = new ProtocolAccessor(SurfaceView);
+            m_SurfaceView = SurfaceView;
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Glazer.Executions.Abstractions
             {
                 AuthorizedActor = AuthorizedActor,
                 TargetAction = Action, Contract = Protocol, Factory = this,
-                ScopedKvTable = m_Storage.SurfaceSet.DisableDispose().Prefix($"{Action.Script}:")
+                ScopedKvTable = m_SurfaceView.DisableDispose().Prefix($"{Action.Script}:")
             });
 
             try { return Factory(); }

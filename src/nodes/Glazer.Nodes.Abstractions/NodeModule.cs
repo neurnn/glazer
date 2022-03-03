@@ -1,13 +1,10 @@
 ﻿using Glazer.P2P.Abstractions;
-using Glazer.P2P.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Glazer.Nodes.Abstractions
 {
@@ -65,9 +62,11 @@ namespace Glazer.Nodes.Abstractions
         /// <param name="Options"></param>
         public virtual void ConfigureMvcBuilder(IMvcBuilder Mvc, NodeOptions Options) { }
 
+
         /// <summary>
-        /// Configure the <see cref="IMessangerHostBuilder"/> with <see cref="NodeOptions"/> instance.
+        /// Configure the <see cref="IMessanger"/> instance.
         /// </summary>
+        /// <param name="App"></param>
         /// <param name="P2P"></param>
         /// <param name="Options"></param>
         public virtual void ConfigureP2PMessanger(IServiceProvider App, IMessanger P2P, NodeOptions Options) { }

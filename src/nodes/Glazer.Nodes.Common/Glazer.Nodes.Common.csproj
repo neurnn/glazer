@@ -4,4 +4,17 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\blocks\Glazer.Storage.Abstraction\Glazer.Storage.Abstraction.csproj" />
+    <ProjectReference Include="..\..\blocks\Glazer.Storage.Integration.AspNetCore\Glazer.Storage.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\blocks\Glazer.Storage.Sqlite\Glazer.Storage.Sqlite.csproj" />
+    <ProjectReference Include="..\..\common\Glazer.Common.Models\Glazer.Common.Models.csproj" />
+    <ProjectReference Include="..\..\common\Glazer.Common\Glazer.Common.csproj" />
+    <ProjectReference Include="..\..\p2p\Glazer.P2P.Tcp\Glazer.P2P.Tcp.csproj" />
+    <ProjectReference Include="..\..\transactions\Glazer.Transactions.Abstractions\Glazer.Transactions.Abstractions.csproj" />
+    <ProjectReference Include="..\..\transactions\Glazer.Transactions.Integration.AspNetCore\Glazer.Transactions.Integration.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\transactions\Glazer.Transactions.Sqlite\Glazer.Transactions.Sqlite.csproj" />
+    <ProjectReference Include="..\Glazer.Nodes.Abstractions\Glazer.Nodes.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>

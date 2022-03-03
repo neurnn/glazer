@@ -34,12 +34,24 @@ namespace Glazer.P2P.Tcp
         /// <param name="Endpoint"></param>
         /// <param name="KeyPair"></param>
         public TcpMessanger(IPEndPoint Endpoint, SignKeyPair KeyPair = default)
+             : this(null, Endpoint, KeyPair)
+        {
+
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TcpMessanger"/> instance,
+        /// </summary>
+        /// <param name="Endpoint"></param>
+        /// <param name="KeyPair"></param>
+        public TcpMessanger(IServiceProvider Services, IPEndPoint Endpoint, SignKeyPair KeyPair = default)
         {
             (m_Listener = new TcpListener(Endpoint)).Start();
 
             if (!KeyPair.IsValid)
                 KeyPair = Signs.Default.Get("secp256k1").MakeKeyPair();
 
+            this.Services = Services;
             this.Endpoint = Endpoint;
             this.KeyPair = KeyPair;
 
@@ -49,6 +61,11 @@ namespace Glazer.P2P.Tcp
         }
 
         /// <summary>
+        /// Service Provider. this is only valid if the integration activated.
+        /// </summary>
+        public IServiceProvider Services { get; }
+
+        /// <summary>
         /// Create a new <see cref="TcpMessanger"/> that uses random port.
         /// </summary>
         /// <param name="Address"></param>
@@ -56,9 +73,28 @@ namespace Glazer.P2P.Tcp
         /// <returns></returns>
         public static TcpMessanger RandomPort(IPAddress Address, SignKeyPair KeyPair = default, ushort InitialPort = 7000)
         {
-            while(true)
+            while (true)
             {
                 try { return new TcpMessanger(new IPEndPoint(Address, InitialPort), KeyPair); }
+                catch
+                {
+                }
+
+                InitialPort = BitConverter.ToUInt16(Rng.Make(2, true));
+            }
+        }
+
+        /// <summary>
+        /// Create a new <see cref="TcpMessanger"/> that uses random port.
+        /// </summary>
+        /// <param name="Address"></param>
+        /// <param name="KeyPair"></param>
+        /// <returns></returns>
+        public static TcpMessanger RandomPort(IServiceProvider Services, IPAddress Address, SignKeyPair KeyPair = default, ushort InitialPort = 7000)
+        {
+            while (true)
+            {
+                try { return new TcpMessanger(Services, new IPEndPoint(Address, InitialPort), KeyPair); }
                 catch
                 {
                 }

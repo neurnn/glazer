@@ -45,7 +45,8 @@ namespace Glazer.Transactions.Sqlite
         {
             if (!File.Exists(this.Path = Path))
                 SQLiteConnection.CreateFile(Path);
-            
+
+            m_Cache = new MemoryTransactionQueue();
             m_Sqlite = new SQLiteConnection($"Data Source={Path}");
             using (var Stmt = m_Sqlite.CreateCommand())
             {

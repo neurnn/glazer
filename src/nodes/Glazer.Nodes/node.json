@@ -1,0 +1,7 @@
+{
+	"actor": "glazer.sys",
+	"pub_key": "secp256k1:d4d85f3d5b2b5fa48e657dce1fa58b90cea55812f29f817054a54b9dd89971a0c23107f6bba8f711f551f4198a50e73c47cc2d2e1a72f0656968381f4d9aa638",
+	"pvt_key": "secp256k1:4386ffe9e8c0131f3e7f91999de581607290d26285017d247e2e5f6d8b95b283",
+	"http_endpoint": "0.0.0.0:5000",
+	"p2p_endpoint": "0.0.0.0:7000"
+}

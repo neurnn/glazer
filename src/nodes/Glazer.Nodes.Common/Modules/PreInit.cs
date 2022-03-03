@@ -1,5 +1,7 @@
 ﻿using Backrole.Crypto;
 using Glazer.Nodes.Abstractions;
+using Glazer.Nodes.Common.Internals;
+using Glazer.Nodes.Common.Internals.Engine;
 using Glazer.P2P.Abstractions;
 using Glazer.P2P.Tcp;
 using Glazer.Storage.Abstraction;
@@ -18,7 +20,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Glazer.Nodes.Modules
+namespace Glazer.Nodes.Common.Modules
 {
     public sealed class PreInit : NodeModule<PreInit>
     {
@@ -90,7 +92,11 @@ namespace Glazer.Nodes.Modules
                 Directory.CreateDirectory(Options.StateDir);
 
             Services
-                .AddSingleton(Options);
+                .AddSingleton(Options)
+                .AddSingleton<INodeLifetime, NodeLifetime>()
+                .AddSingleton<INodeEngineWorker, NodeEngineWorker>()
+                .AddHostedService<NodeEntryPoint>()
+                .AddHostedService<NodeEngineWorker.Service>();
 
             Services /* Block Storage & Transaction Sets. */
                 .SetBlockStorage(App => new SqliteStorage(Options.BlockDir))
@@ -100,7 +106,11 @@ namespace Glazer.Nodes.Modules
                     return new SqliteTransactionSets(Blocks, Options.StateDir);
                 });
 
-            ConfigureP2PMessnager(Services, Options);
+            Services
+                .AddSingleton<INodeEngineManager, NodeEngineManager>()
+                .GetNodeEngineFactory();
+
+            ConfigureP2PMessanger(Services, Options);
         }
 
         /// <summary>
@@ -108,17 +118,18 @@ namespace Glazer.Nodes.Modules
         /// </summary>
         /// <param name="Services"></param>
         /// <param name="Options"></param>
-        private void ConfigureP2PMessnager(IServiceCollection Services, NodeOptions Options)
+        private void ConfigureP2PMessanger(IServiceCollection Services, NodeOptions Options)
         {
             var Endpoint = IPEndPoint.Parse(Options.P2PEndpoint);
             var Seeds = Options.P2PSeeds.Select(X => IPEndPoint.Parse(X)).ToArray();
+
             Services
                 .AddSingleton<IMessanger>(Services =>
                 {
                     if (Debugger.IsAttached)
                     {
                         var Port = (ushort)Math.Min(Endpoint.Port, ushort.MaxValue - 1);
-                        var Instance = TcpMessanger.RandomPort(Endpoint.Address, default, Port);
+                        var Instance = TcpMessanger.RandomPort(Services, Endpoint.Address, default, Port);
 
                         if (Endpoint.Port != Port)
                             Instance.Contact(new IPEndPoint(IPAddress.Loopback, Endpoint.Port));
@@ -129,8 +140,21 @@ namespace Glazer.Nodes.Modules
                         return Instance;
                     }
 
-                    return new TcpMessanger(Endpoint);
+                    return new TcpMessanger(Services, Endpoint);
                 });
+        }
+
+        /// <inheritdoc/>
+        public override void ConfigureP2PMessanger(IServiceProvider App, IMessanger P2P, NodeOptions Options)
+        {
+            var Logger = App.GetService<ILogger<IMessanger>>();
+            if (Logger != null)
+            {
+                P2P.OnPeerEntered += Pub => Logger.LogInformation($"Node attached: {Pub.Value.ToBase58()}");
+                P2P.OnPeerEntered += Pub => Logger.LogInformation($"Node detached: {Pub.Value.ToBase58()}");
+
+                Logger.LogInformation($"P2P messanger is running on: {P2P.Endpoint}.");
+            }
         }
 
         /// <inheritdoc/>
